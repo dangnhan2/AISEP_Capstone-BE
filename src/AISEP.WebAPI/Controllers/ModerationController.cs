@@ -46,7 +46,7 @@ public class ModerationController : ControllerBase
         [FromQuery] int pageSize = 20)
     {
         var result = await _svc.GetFlagsAsync(status, entityType, severity, q, page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -112,7 +112,7 @@ public class ModerationController : ControllerBase
         if (!result.Success)
             return result.ToErrorResult();
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -145,7 +145,7 @@ public class ModerationController : ControllerBase
         if (!result.Success)
             return result.ToErrorResult();
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -161,8 +161,8 @@ public class ModerationController : ControllerBase
         var result = await _svc.GetMyReportsAsync(GetCurrentUserId(), page, pageSize);
 
         if (!result.Success && result.Error?.Code == "NOT_IMPLEMENTED")
-            return StatusCode(StatusCodes.Status501NotImplemented, result);
+            return ApiEnvelopeExtensions.ErrorEnvelope(result.Error?.Message ?? "Not implemented", StatusCodes.Status501NotImplemented);
 
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 }

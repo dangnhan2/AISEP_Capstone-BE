@@ -31,9 +31,9 @@ public class CreateAdvisorRequestValidator : AbstractValidator<CreateAdvisorRequ
             .Must(BeAValidUrlOrNull).WithMessage("LinkedIn URL must be a valid URL.")
             .When(x => !string.IsNullOrWhiteSpace(x.LinkedInURL));
 
-        RuleFor(x => x.YearsOfExperience)
-            .GreaterThanOrEqualTo(0).WithMessage("Years of experience must be >= 0.")
-            .When(x => x.YearsOfExperience.HasValue);
+        RuleFor(x => x.ProfilePhotoURL)
+            .Must(BeAValidUrlOrNull).WithMessage("Profile photo URL must be a valid URL.")
+            .When(x => !string.IsNullOrWhiteSpace(x.ProfilePhotoURL));
 
         RuleFor(x => x.MentorshipPhilosophy)
             .MaximumLength(2000).WithMessage("Mentorship philosophy must not exceed 2000 characters.")
@@ -76,9 +76,9 @@ public class UpdateAdvisorRequestValidator : AbstractValidator<UpdateAdvisorRequ
             .Must(BeAValidUrlOrNull).WithMessage("LinkedIn URL must be a valid URL.")
             .When(x => !string.IsNullOrWhiteSpace(x.LinkedInURL));
 
-        RuleFor(x => x.YearsOfExperience)
-            .GreaterThanOrEqualTo(0).WithMessage("Years of experience must be >= 0.")
-            .When(x => x.YearsOfExperience.HasValue);
+        RuleFor(x => x.ProfilePhotoURL)
+            .Must(BeAValidUrlOrNull).WithMessage("Profile photo URL must be a valid URL.")
+            .When(x => !string.IsNullOrWhiteSpace(x.ProfilePhotoURL));
 
         RuleFor(x => x.MentorshipPhilosophy)
             .MaximumLength(2000).WithMessage("Mentorship philosophy must not exceed 2000 characters.")
@@ -113,6 +113,10 @@ public class UpdateExpertiseRequestValidator : AbstractValidator<UpdateExpertise
             item.RuleFor(e => e.ProficiencyLevel)
                 .MaximumLength(50).WithMessage("Proficiency level must not exceed 50 characters.")
                 .When(e => e.ProficiencyLevel != null);
+
+            item.RuleFor(e => e.YearsOfExperience)
+                .GreaterThanOrEqualTo(0).WithMessage("Years of experience must be >= 0.")
+                .When(e => e.YearsOfExperience.HasValue);
         });
     }
 }

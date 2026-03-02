@@ -31,11 +31,40 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     Log.Information("Starting AISEP Web API");
-    
+
+    // Load .env file (secrets) into environment variables
+    var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+    if (File.Exists(envPath))
+    {
+        DotNetEnv.Env.Load(envPath);
+        Log.Information("Loaded .env file");
+    }
+    else
+    {
+        Log.Warning(".env file not found at {Path} — relying on system environment variables", envPath);
+    }
+
     var builder = WebApplication.CreateBuilder(args);
+
+    // Override config with environment variables (ConnectionStrings__DefaultConnection, Jwt__SecretKey, etc.)
+    builder.Configuration.AddEnvironmentVariables();
+
     builder.Host.UseSerilog();
 
 // Add services to the container.
+
+// CORS — allow FE origin(s) with credentials (cookies)
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:3000" };
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
@@ -106,8 +135,28 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-// Controllers
-builder.Services.AddControllers();
+// Controllers – override default ProblemDetails for validation errors → ApiEnvelope
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .Select(e => new { field = e.Key, messages = e.Value!.Errors.Select(x => x.ErrorMessage).ToArray() })
+                .ToList();
+
+            var envelope = new AISEP.Application.DTOs.Common.ApiEnvelope<object>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Validation failed",
+                Data = errors
+            };
+
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(envelope);
+        };
+    });
 
 // Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -141,17 +190,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-    builder.Services.AddCors(opt =>
-    {
-        opt.AddPolicy("CORS", builder =>
-        {
-            builder.WithOrigins("http://localhost:3000")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-        });
-    });
-
 var app = builder.Build();
 
     // Seed database
@@ -177,12 +215,11 @@ var app = builder.Build();
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AISEP API v1"));
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AISEP API v1"));
     }
 
-    app.UseCors("CORS");
     app.UseHttpsRedirection();
+    app.UseCors("Frontend");
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();

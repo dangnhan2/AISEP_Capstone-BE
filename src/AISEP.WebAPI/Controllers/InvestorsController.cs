@@ -1,6 +1,7 @@
 using AISEP.Application.DTOs.Common;
 using AISEP.Application.DTOs.Investor;
 using AISEP.Application.Interfaces;
+using AISEP.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,14 +61,8 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.CreateProfileAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "INVESTOR_PROFILE_EXISTS")
-            return Conflict(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     /// <summary>
@@ -80,11 +75,7 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.GetMyProfileAsync(userId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -106,11 +97,7 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.UpdateProfileAsync(userId, request);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -127,11 +114,7 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.GetPreferencesAsync(userId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -156,11 +139,7 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.UpdatePreferencesAsync(userId, request);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -188,17 +167,8 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.AddToWatchlistAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "WATCHLIST_EXISTS")
-            return Conflict(result);
-
-        if (!result.Success && result.Error?.Code is "STARTUP_NOT_FOUND" or "INVESTOR_PROFILE_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     /// <summary>
@@ -212,11 +182,7 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.GetWatchlistAsync(userId, page, pageSize);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToPagedEnvelope();
     }
 
     /// <summary>
@@ -229,11 +195,8 @@ public class InvestorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _investorService.RemoveFromWatchlistAsync(userId, startupId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return NoContent();
+        if (!result.Success) return result.ToErrorResult();
+        return ApiEnvelopeExtensions.DeletedEnvelope("Removed from watchlist");
     }
 
     // ================================================================
@@ -265,13 +228,7 @@ public class InvestorsController : ControllerBase
     {
         // minScore is accepted but ignored until AI module is implemented
         var result = await _investorService.SearchStartupsAsync(q, industryId, stage, location, sortBy, page, pageSize);
-
-        if (minScore.HasValue)
-        {
-            result.Message = "Warning: minScore filter is currently ignored. AI scoring module is not yet enabled.";
-        }
-
-        return Ok(result);
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -285,10 +242,8 @@ public class InvestorsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<List<StartupSearchItemDto>>), StatusCodes.Status501NotImplemented)]
     public IActionResult GetRecommendations()
     {
-        var response = ApiResponse<List<StartupSearchItemDto>>.ErrorResponse(
-            "AI_NOT_ENABLED",
-            "AI recommendation engine is not yet enabled. This feature is coming soon.");
-
-        return StatusCode(StatusCodes.Status501NotImplemented, response);
+        return ApiEnvelopeExtensions.ErrorEnvelope(
+            "AI recommendation engine is not yet enabled. This feature is coming soon.",
+            StatusCodes.Status501NotImplemented);
     }
 }

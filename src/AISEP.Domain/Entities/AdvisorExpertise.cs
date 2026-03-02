@@ -7,6 +7,7 @@ public class AdvisorExpertise
     public string Category { get; set; } = string.Empty;
     public string? SubTopic { get; set; }
     public string? ProficiencyLevel { get; set; }
+    public int? YearsOfExperience { get; set; }
 
     // Navigation properties
     public Advisor Advisor { get; set; } = null!;

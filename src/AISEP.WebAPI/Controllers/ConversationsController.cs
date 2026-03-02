@@ -37,7 +37,7 @@ public class ConversationsController : ControllerBase
     {
         var result = await _chatService.GetMyConversationsAsync(
             GetCurrentUserId(), status, page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 
     /// <summary>Create a new conversation for a connection or mentorship.</summary>
@@ -53,7 +53,7 @@ public class ConversationsController : ControllerBase
         if (!result.Success)
             return result.ToErrorResult();
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     /// <summary>Get conversation detail with participants.</summary>
@@ -88,6 +88,6 @@ public class ConversationsController : ControllerBase
     {
         var result = await _chatService.GetMessagesAsync(
             GetCurrentUserId(), id, page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 }

@@ -1,6 +1,8 @@
 using AISEP.Application.DTOs.Common;
 using AISEP.Application.DTOs.MasterData;
 using AISEP.Infrastructure.Data;
+using AISEP.WebAPI.Extensions;
+using static AISEP.WebAPI.Extensions.ApiEnvelopeExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,10 +31,8 @@ public class MasterDataController : ControllerBase
     /// <param name="mode">Response format: "tree" (default) or "flat"</param>
     [HttpGet("industries")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<IndustryDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIndustries([FromQuery] string mode = "tree")
     {
-        // Single query, load all industries with AsNoTracking
         var allIndustries = await _context.Industries
             .AsNoTracking()
             .OrderBy(i => i.IndustryID)
@@ -40,7 +40,6 @@ public class MasterDataController : ControllerBase
 
         if (mode.Equals("flat", StringComparison.OrdinalIgnoreCase))
         {
-            // Flat list - all industries without hierarchy
             var flatList = allIndustries
                 .OrderBy(i => i.ParentIndustryID ?? 0)
                 .ThenBy(i => i.IndustryName)
@@ -50,21 +49,17 @@ public class MasterDataController : ControllerBase
                     IndustryName = i.IndustryName,
                     Description = i.Description,
                     ParentIndustryID = i.ParentIndustryID
-                });
+                })
+                .ToList();
 
-            return Ok(ApiResponse<IEnumerable<IndustrySimpleDto>>.Ok(flatList));
+            return OkEnvelope<List<IndustrySimpleDto>>(flatList);
         }
 
-        // Tree mode (default) - build tree in-memory
-        var industryLookup = allIndustries.ToDictionary(i => i.IndustryID);
-        
-        // Get root industries (ParentIndustryID == null)
         var rootIndustries = allIndustries
             .Where(i => i.ParentIndustryID == null)
             .OrderBy(i => i.IndustryID)
             .ToList();
 
-        // Build tree structure
         var tree = rootIndustries.Select(parent => new IndustryDto
         {
             IndustryID = parent.IndustryID,
@@ -80,12 +75,12 @@ public class MasterDataController : ControllerBase
                     IndustryName = sub.IndustryName,
                     Description = sub.Description,
                     ParentIndustryID = sub.ParentIndustryID,
-                    SubIndustries = new List<IndustryDto>() // No deeper nesting in MVP
+                    SubIndustries = new List<IndustryDto>()
                 })
                 .ToList()
-        });
+        }).ToList();
 
-        return Ok(ApiResponse<IEnumerable<IndustryDto>>.Ok(tree));
+        return OkEnvelope<List<IndustryDto>>(tree);
     }
 
     // Hardcoded startup stages (matches ERD: Stage varchar in Startups table)
@@ -105,9 +100,9 @@ public class MasterDataController : ControllerBase
     /// </summary>
     [HttpGet("stages")]
     [AllowAnonymous]
-    public ActionResult<ApiResponse<IEnumerable<StartupStageDto>>> GetStages()
+    public IActionResult GetStages()
     {
-        return Ok(ApiResponse<IEnumerable<StartupStageDto>>.Ok(_stages));
+        return OkEnvelope<List<StartupStageDto>>(_stages);
     }
 
     /// <summary>
@@ -115,7 +110,7 @@ public class MasterDataController : ControllerBase
     /// </summary>
     [HttpGet("roles")]
     [AllowAnonymous]
-    public async Task<ActionResult<ApiResponse<IEnumerable<RoleSimpleDto>>>> GetRoles()
+    public async Task<IActionResult> GetRoles()
     {
         var roles = await _context.Roles
             .OrderBy(r => r.RoleName)
@@ -127,6 +122,6 @@ public class MasterDataController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(ApiResponse<IEnumerable<RoleSimpleDto>>.Ok(roles));
+        return OkEnvelope<List<RoleSimpleDto>>(roles);
     }
 }

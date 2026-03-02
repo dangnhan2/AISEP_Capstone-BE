@@ -39,9 +39,9 @@ public class AdvisorService : IAdvisorService
             Title = request.Title,
             Company = request.Company,
             Bio = request.Bio,
+            ProfilePhotoURL = request.ProfilePhotoURL,
             Website = request.Website,
             LinkedInURL = request.LinkedInURL,
-            YearsOfExperience = request.YearsOfExperience,
             MentorshipPhilosophy = request.MentorshipPhilosophy,
             ProfileStatus = "Draft",
             CreatedAt = DateTime.UtcNow
@@ -92,9 +92,9 @@ public class AdvisorService : IAdvisorService
         if (request.Title != null) advisor.Title = request.Title;
         if (request.Company != null) advisor.Company = request.Company;
         if (request.Bio != null) advisor.Bio = request.Bio;
+        if (request.ProfilePhotoURL != null) advisor.ProfilePhotoURL = request.ProfilePhotoURL;
         if (request.Website != null) advisor.Website = request.Website;
         if (request.LinkedInURL != null) advisor.LinkedInURL = request.LinkedInURL;
-        if (request.YearsOfExperience.HasValue) advisor.YearsOfExperience = request.YearsOfExperience.Value;
         if (request.MentorshipPhilosophy != null) advisor.MentorshipPhilosophy = request.MentorshipPhilosophy;
         advisor.UpdatedAt = DateTime.UtcNow;
 
@@ -130,7 +130,8 @@ public class AdvisorService : IAdvisorService
                 AdvisorID = advisor.AdvisorID,
                 Category = item.Category,
                 SubTopic = item.SubTopic,
-                ProficiencyLevel = item.ProficiencyLevel
+                ProficiencyLevel = item.ProficiencyLevel,
+                YearsOfExperience = item.YearsOfExperience
             })
             .ToList();
 
@@ -147,7 +148,8 @@ public class AdvisorService : IAdvisorService
         {
             Category = e.Category,
             SubTopic = e.SubTopic,
-            ProficiencyLevel = e.ProficiencyLevel
+            ProficiencyLevel = e.ProficiencyLevel,
+            YearsOfExperience = e.YearsOfExperience
         }).ToList();
 
         return ApiResponse<List<ExpertiseItemDto>>.SuccessResponse(result);
@@ -267,11 +269,16 @@ public class AdvisorService : IAdvisorService
             Company = a.Company,
             BioShort = TruncateBio(a.Bio, 200),
             Website = a.Website,
-            YearsOfExperience = a.YearsOfExperience,
             AverageRating = a.AverageRating,
             IsAcceptingNewMentees = a.Availability?.IsAcceptingNewMentees ?? false,
             Industries = a.IndustryFocus.Select(f => f.Industry).ToList(),
-            Expertise = a.Expertise.Select(e => e.Category).Distinct().ToList()
+            Expertise = a.Expertise.Select(e => new ExpertiseItemDto
+            {
+                Category = e.Category,
+                SubTopic = e.SubTopic,
+                ProficiencyLevel = e.ProficiencyLevel,
+                YearsOfExperience = e.YearsOfExperience
+            }).ToList()
         }).ToList();
 
         return ApiResponse<PagedResponse<AdvisorSearchItemDto>>.SuccessResponse(new PagedResponse<AdvisorSearchItemDto>
@@ -303,7 +310,6 @@ public class AdvisorService : IAdvisorService
         Company = a.Company,
         Bio = a.Bio,
         ProfilePhotoURL = a.ProfilePhotoURL,
-        YearsOfExperience = a.YearsOfExperience,
         MentorshipPhilosophy = a.MentorshipPhilosophy,
         LinkedInURL = a.LinkedInURL,
         Website = a.Website,
@@ -318,7 +324,8 @@ public class AdvisorService : IAdvisorService
         {
             Category = e.Category,
             SubTopic = e.SubTopic,
-            ProficiencyLevel = e.ProficiencyLevel
+            ProficiencyLevel = e.ProficiencyLevel,
+            YearsOfExperience = e.YearsOfExperience
         }).ToList(),
         Availability = availability != null ? MapAvailabilityDto(availability) : null,
         IndustryFocus = industryFocus.Select(f => f.Industry).ToList()

@@ -1,6 +1,7 @@
 using AISEP.Application.DTOs.Common;
 using AISEP.Application.DTOs.Document;
 using AISEP.Application.Interfaces;
+using AISEP.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,11 +63,8 @@ public class DocumentsController : ControllerBase
 
         var userId = GetCurrentUserId();
         var result = await _documentService.UploadAsync(form.File, request, userId, ct);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -96,11 +94,7 @@ public class DocumentsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _documentService.GetMyDocumentsAsync(userId, documentType, isArchived, q, sortBy, page, pageSize, ct);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -118,11 +112,7 @@ public class DocumentsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _documentService.GetMyDocumentAsync(documentId, userId, ct);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -143,7 +133,7 @@ public class DocumentsController : ControllerBase
         var result = await _documentService.DownloadMyDocumentAsync(documentId, userId, ct);
 
         if (!result.Success)
-            return NotFound(ApiResponse<string>.ErrorResponse(result.Error!.Code, result.Error.Message));
+            return ApiEnvelopeExtensions.ErrorEnvelope(result.Error!.Message, StatusCodes.Status404NotFound);
 
         var (stream, contentType, fileName) = result.Data;
         return File(stream, contentType, fileName);
@@ -167,11 +157,7 @@ public class DocumentsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _documentService.UpdateMetadataAsync(documentId, request, userId, ct);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -190,10 +176,6 @@ public class DocumentsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _documentService.ArchiveAsync(documentId, userId, ct);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToDeletedEnvelope("Document archived");
     }
 }

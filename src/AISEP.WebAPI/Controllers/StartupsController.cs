@@ -1,6 +1,7 @@
 using AISEP.Application.DTOs.Common;
 using AISEP.Application.DTOs.Startup;
 using AISEP.Application.Interfaces;
+using AISEP.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,14 +66,8 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.CreateStartupAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "STARTUP_PROFILE_EXISTS")
-            return Conflict(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     /// <summary>
@@ -86,11 +81,7 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.GetMyStartupAsync(userId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -104,14 +95,7 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.UpdateStartupAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "STARTUP_PROFILE_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -126,14 +110,7 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.SubmitForApprovalAsync(userId);
-
-        if (!result.Success && result.Error?.Code == "STARTUP_PROFILE_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success)
-            return Conflict(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -166,11 +143,7 @@ public class StartupsController : ControllerBase
     public async Task<IActionResult> GetStartupById(int startupId)
     {
         var result = await _startupService.GetStartupByIdAsync(startupId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -192,7 +165,7 @@ public class StartupsController : ControllerBase
         [FromQuery] int pageSize = 20)
     {
         var result = await _startupService.SearchStartupsAsync(q, industry, stage, page, pageSize);
-        return Ok(result);
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -210,11 +183,7 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.GetTeamMembersAsync(userId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -229,14 +198,8 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.AddTeamMemberAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "STARTUP_PROFILE_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     /// <summary>
@@ -250,11 +213,7 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.UpdateTeamMemberAsync(userId, teamMemberId, request);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -268,10 +227,6 @@ public class StartupsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.DeleteTeamMemberAsync(userId, teamMemberId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 }

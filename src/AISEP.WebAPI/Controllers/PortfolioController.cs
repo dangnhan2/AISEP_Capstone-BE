@@ -37,7 +37,7 @@ public class PortfolioController : ControllerBase
     public async Task<IActionResult> GetPortfolio([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var result = await _svc.GetPortfolioAsync(GetCurrentUserId(), page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -51,7 +51,7 @@ public class PortfolioController : ControllerBase
     {
         var result = await _svc.CreatePortfolioAsync(GetCurrentUserId(), request);
         if (!result.Success) return result.ToErrorResult();
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -80,6 +80,6 @@ public class PortfolioController : ControllerBase
     {
         var result = await _svc.DeletePortfolioAsync(GetCurrentUserId(), id);
         if (!result.Success) return result.ToErrorResult();
-        return NoContent();
+        return ApiEnvelopeExtensions.DeletedEnvelope("Portfolio company removed");
     }
 }

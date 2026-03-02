@@ -43,7 +43,7 @@ public class ConnectionsController : ControllerBase
     {
         var result = await _svc.CreateConnectionAsync(GetCurrentUserId(), request);
         if (!result.Success) return result.ToErrorResult();
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -57,7 +57,7 @@ public class ConnectionsController : ControllerBase
     public async Task<IActionResult> GetSent([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var result = await _svc.GetSentAsync(GetCurrentUserId(), status, page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -99,7 +99,7 @@ public class ConnectionsController : ControllerBase
     public async Task<IActionResult> GetReceived([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var result = await _svc.GetReceivedAsync(GetCurrentUserId(), status, page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -169,7 +169,7 @@ public class ConnectionsController : ControllerBase
     {
         var result = await _svc.CreateInfoRequestAsync(GetCurrentUserId(), id, request);
         if (!result.Success) return result.ToErrorResult();
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================

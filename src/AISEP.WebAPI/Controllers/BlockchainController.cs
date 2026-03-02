@@ -1,6 +1,7 @@
 using AISEP.Application.DTOs.Blockchain;
 using AISEP.Application.DTOs.Common;
 using AISEP.Application.Interfaces;
+using AISEP.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,11 +44,7 @@ public class BlockchainController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _proofService.ComputeHashAsync(documentId, userId, ct);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -68,17 +65,7 @@ public class BlockchainController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _proofService.SubmitToChainAsync(documentId, userId, ct);
-
-        if (!result.Success && result.Error?.Code == "DOCUMENT_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "BLOCKCHAIN_ERROR")
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -97,14 +84,7 @@ public class BlockchainController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _proofService.VerifyOnChainAsync(documentId, userId, ct);
-
-        if (!result.Success && result.Error?.Code == "DOCUMENT_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success)
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -124,17 +104,7 @@ public class BlockchainController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _proofService.GetTxStatusAsync(documentId, userId, ct);
-
-        if (!result.Success && result.Error?.Code == "DOCUMENT_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "PROOF_NOT_SUBMITTED")
-            return UnprocessableEntity(result);
-
-        if (!result.Success)
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -153,13 +123,6 @@ public class BlockchainController : ControllerBase
     {
         var staffUserId = GetCurrentUserId();
         var result = await _proofService.StaffVerifyHashAsync(documentId, staffUserId, ct);
-
-        if (!result.Success && result.Error?.Code == "DOCUMENT_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success)
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 }

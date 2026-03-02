@@ -9,7 +9,6 @@ public class Advisor
     public string? Company { get; set; }
     public string? Bio { get; set; }
     public string? ProfilePhotoURL { get; set; }
-    public int? YearsOfExperience { get; set; }
     public string? MentorshipPhilosophy { get; set; }
     public string? LinkedInURL { get; set; }
     public string? Website { get; set; }

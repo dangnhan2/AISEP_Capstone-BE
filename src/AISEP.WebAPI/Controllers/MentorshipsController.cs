@@ -50,14 +50,8 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.CreateRequestAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_ALREADY_EXISTS")
-            return Conflict(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -78,12 +72,7 @@ public class MentorshipsController : ControllerBase
         var userId = GetCurrentUserId();
         var userType = GetCurrentUserType();
         var result = await _mentorshipService.GetMyMentorshipsAsync(userId, userType, status, page, pageSize);
-
-        if (!result.Success && result.Error?.Code == "ACCESS_DENIED")
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return Ok(result);
+        return result.ToPagedEnvelope();
     }
 
     // ================================================================
@@ -122,15 +111,7 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.AcceptAsync(userId, id);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_OWNED")
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -149,15 +130,7 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.RejectAsync(userId, id, request.Reason);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_OWNED")
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -177,15 +150,8 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.CreateSessionAsync(userId, id, request);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && (result.Error?.Code == "MENTORSHIP_NOT_OWNED" || result.Error?.Code == "ADVISOR_PROFILE_NOT_FOUND"))
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -203,15 +169,7 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.UpdateSessionAsync(userId, sessionId, request);
-
-        if (!result.Success && result.Error?.Code == "SESSION_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_OWNED")
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -230,15 +188,8 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.CreateReportAsync(userId, id, request);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && (result.Error?.Code == "MENTORSHIP_NOT_OWNED" || result.Error?.Code == "ADVISOR_PROFILE_NOT_FOUND"))
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -256,15 +207,7 @@ public class MentorshipsController : ControllerBase
         var userId = GetCurrentUserId();
         var userType = GetCurrentUserType();
         var result = await _mentorshipService.GetReportAsync(userId, userType, reportId);
-
-        if (!result.Success && result.Error?.Code == "REPORT_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_OWNED")
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -283,14 +226,7 @@ public class MentorshipsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _mentorshipService.CreateFeedbackAsync(userId, id, request);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_FOUND")
-            return NotFound(result);
-
-        if (!result.Success && result.Error?.Code == "MENTORSHIP_NOT_OWNED")
-            return StatusCode(StatusCodes.Status403Forbidden, result);
-
-        if (!result.Success) return BadRequest(result);
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 }

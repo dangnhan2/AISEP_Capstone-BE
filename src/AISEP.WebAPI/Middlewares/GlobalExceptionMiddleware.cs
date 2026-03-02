@@ -36,56 +36,31 @@ public class GlobalExceptionMiddleware
 
         context.Response.ContentType = "application/json";
         
-        var response = exception switch
+        var (statusCode, message) = exception switch
         {
-            UnauthorizedAccessException => new ErrorResponse(
-                HttpStatusCode.Unauthorized,
-                "UNAUTHORIZED",
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized,
                 "You are not authorized to access this resource"),
-            
-            KeyNotFoundException => new ErrorResponse(
-                HttpStatusCode.NotFound,
-                "NOT_FOUND",
+
+            KeyNotFoundException => (StatusCodes.Status404NotFound,
                 exception.Message),
-            
-            ArgumentException => new ErrorResponse(
-                HttpStatusCode.BadRequest,
-                "BAD_REQUEST",
+
+            ArgumentException => (StatusCodes.Status400BadRequest,
                 exception.Message),
-            
-            InvalidOperationException => new ErrorResponse(
-                HttpStatusCode.Conflict,
-                "CONFLICT",
+
+            InvalidOperationException => (StatusCodes.Status409Conflict,
                 exception.Message),
-            
-            _ => new ErrorResponse(
-                HttpStatusCode.InternalServerError,
-                "INTERNAL_ERROR",
+
+            _ => (StatusCodes.Status500InternalServerError,
                 "An unexpected error occurred. Please try again later.")
         };
 
-        context.Response.StatusCode = (int)response.StatusCode;
+        context.Response.StatusCode = statusCode;
 
-        var result = new ApiResponse
-        {
-            Success = false,
-            Error = new ErrorDetail
-            {
-                Code = response.Code,
-                Message = response.Message,
-                Details = new List<FieldError>
-                {
-                    new() { Field = "requestId", Message = requestId }
-                }
-            }
-        };
-
+        var envelope = ApiEnvelope<object>.Error(message, statusCode);
         var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        await context.Response.WriteAsync(JsonSerializer.Serialize(result, options));
+        await context.Response.WriteAsync(JsonSerializer.Serialize(envelope, options));
     }
 }
-
-public record ErrorResponse(HttpStatusCode StatusCode, string Code, string Message);
 
 public static class GlobalExceptionMiddlewareExtensions
 {

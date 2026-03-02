@@ -14,9 +14,9 @@ public class CreateAdvisorRequest
     public string? Title { get; set; }
     public string? Company { get; set; }
     public string? Bio { get; set; }
+    public string? ProfilePhotoURL { get; set; }
     public string? Website { get; set; }
     public string? LinkedInURL { get; set; }
-    public int? YearsOfExperience { get; set; }
     public string? MentorshipPhilosophy { get; set; }
 }
 
@@ -29,9 +29,9 @@ public class UpdateAdvisorRequest
     public string? Title { get; set; }
     public string? Company { get; set; }
     public string? Bio { get; set; }
+    public string? ProfilePhotoURL { get; set; }
     public string? Website { get; set; }
     public string? LinkedInURL { get; set; }
-    public int? YearsOfExperience { get; set; }
     public string? MentorshipPhilosophy { get; set; }
 }
 
@@ -73,7 +73,6 @@ public class AdvisorMeDto
     public string? Company { get; set; }
     public string? Bio { get; set; }
     public string? ProfilePhotoURL { get; set; }
-    public int? YearsOfExperience { get; set; }
     public string? MentorshipPhilosophy { get; set; }
     public string? LinkedInURL { get; set; }
     public string? Website { get; set; }
@@ -95,6 +94,7 @@ public class ExpertiseItemDto
     public string Category { get; set; } = null!;
     public string? SubTopic { get; set; }
     public string? ProficiencyLevel { get; set; }
+    public int? YearsOfExperience { get; set; }
 }
 
 /// <summary>Advisor availability configuration.</summary>
@@ -122,9 +122,8 @@ public class AdvisorSearchItemDto
     public string? Company { get; set; }
     public string? BioShort { get; set; }
     public string? Website { get; set; }
-    public int? YearsOfExperience { get; set; }
     public float? AverageRating { get; set; }
     public bool IsAcceptingNewMentees { get; set; }
     public List<string> Industries { get; set; } = new();
-    public List<string> Expertise { get; set; } = new();
+    public List<ExpertiseItemDto> Expertise { get; set; } = new();
 }

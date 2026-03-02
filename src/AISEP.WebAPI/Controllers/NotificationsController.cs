@@ -43,7 +43,7 @@ public class NotificationsController : ControllerBase
     {
         var result = await _notificationService.GetMyNotificationsAsync(
             GetCurrentUserId(), unreadOnly, type, page, pageSize);
-        return result.ToActionResult();
+        return result.ToPagedEnvelope();
     }
 
     // ── 2) GET /api/notifications/{id} ────────────────────────────
@@ -98,6 +98,6 @@ public class NotificationsController : ControllerBase
         if (!result.Success)
             return result.ToErrorResult();
 
-        return NoContent();
+        return ApiEnvelopeExtensions.DeletedEnvelope("Notification deleted");
     }
 }

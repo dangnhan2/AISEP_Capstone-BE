@@ -40,7 +40,7 @@ public class MessagesController : ControllerBase
         if (!result.Success)
             return result.ToErrorResult();
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return result.ToCreatedEnvelope();
     }
 
     /// <summary>Mark a single message as read.</summary>

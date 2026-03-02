@@ -1,6 +1,7 @@
 using AISEP.Application.DTOs.Advisor;
 using AISEP.Application.DTOs.Common;
 using AISEP.Application.Interfaces;
+using AISEP.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,14 +49,8 @@ public class AdvisorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _advisorService.CreateProfileAsync(userId, request);
-
-        if (!result.Success && result.Error?.Code == "ADVISOR_PROFILE_EXISTS")
-            return Conflict(result);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return StatusCode(StatusCodes.Status201Created, result);
+        if (!result.Success) return result.ToErrorResult();
+        return result.ToCreatedEnvelope();
     }
 
     // ================================================================
@@ -73,11 +68,7 @@ public class AdvisorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _advisorService.GetMyProfileAsync(userId);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -97,11 +88,7 @@ public class AdvisorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _advisorService.UpdateProfileAsync(userId, request);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -122,11 +109,7 @@ public class AdvisorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _advisorService.UpdateExpertiseAsync(userId, request);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -146,11 +129,7 @@ public class AdvisorsController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var result = await _advisorService.UpdateAvailabilityAsync(userId, request);
-
-        if (!result.Success)
-            return NotFound(result);
-
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     // ================================================================
@@ -177,6 +156,6 @@ public class AdvisorsController : ControllerBase
         CancellationToken ct = default)
     {
         var result = await _advisorService.SearchAdvisorsAsync(q, industryId, expertise, page, pageSize);
-        return Ok(result);
+        return result.ToPagedEnvelope();
     }
 }
