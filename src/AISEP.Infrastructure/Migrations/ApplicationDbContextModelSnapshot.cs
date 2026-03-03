@@ -3,8 +3,8 @@ using System;
 using AISEP.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -17,1736 +17,2746 @@ namespace AISEP.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Advisor", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AdvisorID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AdvisorID"));
+
+                    b.Property<float?>("AverageRating")
+                        .HasColumnType("real");
 
                     b.Property<string>("Bio")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("bio");
-
-                    b.Property<string>("Certifications")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("certifications");
+                        .HasColumnType("text");
 
                     b.Property<string>("Company")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("company");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<string>("ExpertiseAreas")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("expertise_areas");
+                    b.Property<string>("LinkedInURL")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsAvailable")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_available");
+                    b.Property<string>("MentorshipPhilosophy")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
+                    b.Property<int?>("ProfileCompleteness")
+                        .HasColumnType("integer");
 
-                    b.Property<bool>("IsPublished")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_published");
+                    b.Property<string>("ProfilePhotoURL")
+                        .HasColumnType("text");
 
-                    b.Property<string>("LinkedInUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("linkedin_url");
+                    b.Property<string>("ProfileStatus")
+                        .HasColumnType("text");
 
-                    b.Property<int>("MaxMenteesPerMonth")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(5)
-                        .HasColumnName("max_mentees_per_month");
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
 
-                    b.Property<string>("ProfessionalTitle")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("professional_title");
+                    b.Property<int>("TotalMentees")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("TotalSessionHours")
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("YearsOfExperience")
-                        .HasColumnType("int")
-                        .HasColumnName("years_of_experience");
+                    b.Property<string>("Website")
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("AdvisorID");
 
-                    b.HasIndex("IsAvailable")
-                        .HasDatabaseName("ix_advisor_profiles_is_available");
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
-                    b.HasIndex("IsPublished")
-                        .HasDatabaseName("ix_advisor_profiles_is_published");
+                    b.ToTable("Advisors");
+                });
 
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_advisor_profiles_user_id");
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorAchievement", b =>
+                {
+                    b.Property<int>("AchievementID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.ToTable("advisor_profiles", (string)null);
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AchievementID"));
+
+                    b.Property<string>("AchievementType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("AdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("URL")
+                        .HasColumnType("text");
+
+                    b.HasKey("AchievementID");
+
+                    b.HasIndex("AdvisorID");
+
+                    b.ToTable("AdvisorAchievements");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorAvailability", b =>
+                {
+                    b.Property<int>("AvailabilityID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AvailabilityID"));
+
+                    b.Property<int>("AdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("CalendarConnected")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsAcceptingNewMentees")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MaxConcurrentMentees")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ResponseTimeCommitment")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SessionFormats")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TypicalSessionDuration")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("WeeklyAvailableHours")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AvailabilityID");
+
+                    b.HasIndex("AdvisorID")
+                        .IsUnique();
+
+                    b.ToTable("AdvisorAvailabilities");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorExpertise", b =>
+                {
+                    b.Property<int>("ExpertiseID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExpertiseID"));
+
+                    b.Property<int>("AdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProficiencyLevel")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubTopic")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ExpertiseID");
+
+                    b.HasIndex("AdvisorID");
+
+                    b.ToTable("AdvisorExpertises");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorIndustryFocus", b =>
+                {
+                    b.Property<int>("IndustryFocusID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IndustryFocusID"));
+
+                    b.Property<int>("AdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("IndustryFocusID");
+
+                    b.HasIndex("AdvisorID");
+
+                    b.ToTable("AdvisorIndustryFocuses");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorTestimonial", b =>
+                {
+                    b.Property<int>("TestimonialID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TestimonialID"));
+
+                    b.Property<int>("AdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsApprovedByFounder")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MentorshipID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StartupID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TestimonialText")
+                        .HasColumnType("text");
+
+                    b.HasKey("TestimonialID");
+
+                    b.HasIndex("AdvisorID");
+
+                    b.HasIndex("MentorshipID");
+
+                    b.HasIndex("StartupID");
+
+                    b.ToTable("AdvisorTestimonials");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.AuditLog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("LogID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogID"));
 
-                    b.Property<int>("Action")
-                        .HasColumnType("int");
+                    b.Property<string>("ActionDetails")
+                        .HasColumnType("text");
 
-                    b.Property<string>("AdditionalData")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("EntityId")
-                        .HasColumnType("int");
+                    b.Property<int?>("EntityID")
+                        .HasColumnType("integer");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<string>("IpAddress")
+                    b.Property<string>("IPAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NewValues")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldValues")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("text");
 
                     b.Property<string>("UserAgent")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<string>("UserEmail")
+                    b.Property<int?>("UserID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("LogID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("AuditLogs");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Conversation", b =>
+                {
+                    b.Property<int>("ConversationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ConversationID"));
+
+                    b.Property<int?>("ConnectionID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConversationStatus")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastMessageAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("MentorshipID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ConversationID");
+
+                    b.HasIndex("ConnectionID");
+
+                    b.HasIndex("MentorshipID");
+
+                    b.ToTable("Conversations");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Document", b =>
+                {
+                    b.Property<int>("DocumentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DocumentID"));
+
+                    b.Property<string>("AnalysisStatus")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("AnalyzedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileFormat")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FileSize")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FileURL")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsAnalyzed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("StartupID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Version")
+                        .HasColumnType("text");
+
+                    b.HasKey("DocumentID");
+
+                    b.HasIndex("StartupID");
+
+                    b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.DocumentBlockchainProof", b =>
+                {
+                    b.Property<int>("ProofID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProofID"));
+
+                    b.Property<DateTime?>("AnchoredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("AnchoredBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("AnchoredByUserUserID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BlockNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BlockchainNetwork")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DocumentID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FileHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HashAlgorithm")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProofStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TransactionHash")
+                        .HasColumnType("text");
+
+                    b.HasKey("ProofID");
+
+                    b.HasIndex("AnchoredByUserUserID");
+
+                    b.HasIndex("DocumentID")
+                        .IsUnique();
+
+                    b.ToTable("DocumentBlockchainProofs");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.EmailOtp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Otp")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("EmailOtps");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.BlockchainTransaction", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.FlaggedContent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("FlagID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FlagID"));
 
-                    b.Property<long?>("BlockNumber")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ContentID")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("ConfirmedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("GasUsed")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TransactionHash")
+                    b.Property<string>("ContentType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("FlagDetails")
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId")
-                        .IsUnique();
-
-                    b.ToTable("BlockchainTransactions");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.Connection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AcceptedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("AdvisorProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeclinedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("InvestorProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StartupProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdvisorProfileId");
-
-                    b.HasIndex("InvestorProfileId");
-
-                    b.HasIndex("StartupProfileId");
-
-                    b.ToTable("Connections");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.ConsultationFeedback", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ConsultationReportId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImprovementSuggestions")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsHelpful")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MentorshipSessionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProvidedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SpecificFeedback")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("WouldRecommend")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsultationReportId");
-
-                    b.HasIndex("MentorshipSessionId");
-
-                    b.HasIndex("ProvidedByUserId");
-
-                    b.ToTable("ConsultationFeedbacks");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.ConsultationReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActionItems")
-                        .HasMaxLength(5000)
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("action_items");
-
-                    b.Property<int>("ConsultationRequestId")
-                        .HasColumnType("int")
-                        .HasColumnName("consultation_request_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("CreatedByUserId")
-                        .HasColumnType("int")
-                        .HasColumnName("created_by_user_id");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("FollowUpNotes")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("follow_up_notes");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
-
-                    b.Property<bool>("IsSharedWithStartup")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_shared_with_startup");
-
-                    b.Property<string>("KeyDiscussionPoints")
-                        .HasMaxLength(5000)
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("key_discussion_points");
-
-                    b.Property<int>("MentorshipSessionId")
-                        .HasColumnType("int")
-                        .HasColumnName("mentorship_session_id");
-
-                    b.Property<int?>("MentorshipSessionId1")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("NextSessionSuggested")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("next_session_suggested");
-
-                    b.Property<string>("RecommendedResources")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("recommended_resources");
-
-                    b.Property<DateTime?>("SharedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("shared_at");
-
-                    b.Property<string>("Summary")
+                    b.Property<string>("FlagReason")
                         .IsRequired()
-                        .HasMaxLength(5000)
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("summary");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                    b.Property<string>("FlagSource")
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime>("FlaggedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasIndex("ConsultationRequestId")
-                        .HasDatabaseName("ix_consultation_reports_consultation_request_id");
+                    b.Property<string>("ModerationAction")
+                        .HasColumnType("text");
 
-                    b.HasIndex("CreatedByUserId")
-                        .HasDatabaseName("ix_consultation_reports_created_by_user_id");
+                    b.Property<string>("ModerationStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("MentorshipSessionId")
-                        .HasDatabaseName("ix_consultation_reports_mentorship_session_id");
+                    b.Property<string>("ModeratorNotes")
+                        .HasColumnType("text");
 
-                    b.HasIndex("MentorshipSessionId1")
-                        .IsUnique()
-                        .HasFilter("[MentorshipSessionId1] IS NOT NULL");
+                    b.Property<int?>("RelatedUserID")
+                        .HasColumnType("integer");
 
-                    b.ToTable("consultation_reports", (string)null);
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ReviewedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Severity")
+                        .HasColumnType("text");
+
+                    b.HasKey("FlagID");
+
+                    b.HasIndex("RelatedUserID");
+
+                    b.HasIndex("ReviewedBy");
+
+                    b.ToTable("FlaggedContents");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.ConsultationRequest", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Industry", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IndustryID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AcceptedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("AdvisorProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeclineReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeclinedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IndustryID"));
 
                     b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("IndustryName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<int>("EstimatedDurationMinutes")
-                        .HasColumnType("int");
+                    b.Property<int?>("ParentIndustryID")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ExpectedOutcome")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("IndustryID");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.HasIndex("ParentIndustryID");
 
-                    b.Property<string>("MeetingLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MentorshipSessionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PreferredSchedule")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RequestedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ScheduledDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("StartupProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Topic")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdvisorProfileId");
-
-                    b.HasIndex("MentorshipSessionId")
-                        .IsUnique()
-                        .HasFilter("[MentorshipSessionId] IS NOT NULL");
-
-                    b.HasIndex("StartupProfileId");
-
-                    b.ToTable("ConsultationRequests");
+                    b.ToTable("Industries");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.Document", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.IndustryTrend", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TrendID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TrendID"));
 
-                    b.Property<string>("ContentHash")
+                    b.Property<string>("AIGeneratedInsights")
+                        .HasColumnType("text");
+
+                    b.Property<float?>("AveragePotentialScore")
+                        .HasColumnType("real");
+
+                    b.Property<decimal?>("AverageRoundSize")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("CommonWeaknesses")
+                        .HasColumnType("text");
+
+                    b.Property<int>("IndustryID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StartupCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TopStrengths")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("TotalFundingRaised")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("TrendPeriod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("StartupProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                    b.HasKey("TrendID");
 
-                    b.HasKey("Id");
+                    b.HasIndex("IndustryID");
 
-                    b.HasIndex("StartupProfileId");
-
-                    b.ToTable("Documents");
+                    b.ToTable("IndustryTrends");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.DocumentAnalysis", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.InformationRequest", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RequestID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RequestID"));
 
-                    b.Property<string>("AnalysisResult")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ConnectionID")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("FulfilledAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("ReminderSentAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
+                    b.Property<string>("RequestMessage")
+                        .HasColumnType("text");
 
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExtractedText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId")
-                        .IsUnique();
-
-                    b.ToTable("DocumentAnalyses");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.InvestmentProposal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AcceptedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("accepted_at");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("DeclineReason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("decline_reason");
-
-                    b.Property<DateTime?>("DeclinedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("declined_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<DateTime?>("DueDiligenceDeadline")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("due_diligence_deadline");
-
-                    b.Property<decimal?>("EquityPercentage")
-                        .HasColumnType("decimal(5,2)")
-                        .HasColumnName("equity_percentage");
-
-                    b.Property<string>("InvestmentType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("investment_type");
-
-                    b.Property<int>("InvestorProfileId")
-                        .HasColumnType("int")
-                        .HasColumnName("investor_profile_id");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("Message")
+                    b.Property<string>("RequestStatus")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("message");
+                        .HasColumnType("text");
 
-                    b.Property<string>("Notes")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("notes");
-
-                    b.Property<decimal>("ProposedAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("proposed_amount");
-
-                    b.Property<DateTime?>("ResponseDeadline")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("response_deadline");
-
-                    b.Property<int>("StartupProfileId")
-                        .HasColumnType("int")
-                        .HasColumnName("startup_profile_id");
-
-                    b.Property<string>("Status")
+                    b.Property<string>("RequestType")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("SubmittedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("submitted_at");
+                    b.Property<DateTime?>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TermSheetUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("term_sheet_url");
+                    b.Property<string>("ResponseDocumentIDs")
+                        .HasColumnType("text");
 
-                    b.Property<string>("Terms")
-                        .HasMaxLength(5000)
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("terms");
+                    b.Property<string>("ResponseMessage")
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                    b.HasKey("RequestID");
 
-                    b.Property<decimal?>("Valuation")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("valuation");
+                    b.HasIndex("ConnectionID");
 
-                    b.HasKey("Id");
+                    b.HasIndex("InvestorID");
 
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("ix_investment_proposals_created_at");
-
-                    b.HasIndex("InvestorProfileId")
-                        .HasDatabaseName("ix_investment_proposals_investor_profile_id");
-
-                    b.HasIndex("StartupProfileId")
-                        .HasDatabaseName("ix_investment_proposals_startup_profile_id");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_investment_proposals_status");
-
-                    b.HasIndex("InvestorProfileId", "Status")
-                        .HasDatabaseName("ix_investment_proposals_investor_status");
-
-                    b.HasIndex("StartupProfileId", "Status")
-                        .HasDatabaseName("ix_investment_proposals_startup_status");
-
-                    b.ToTable("investment_proposals", (string)null);
+                    b.ToTable("InformationRequests");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.InvestorProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Investor", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InvestorID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("InvestorID"));
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
+                    b.Property<string>("FirmName")
+                        .HasColumnType("text");
 
-                    b.Property<string>("GeographicFocus")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("geographic_focus");
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("InvestmentThesis")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("investment_thesis");
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
+                    b.Property<string>("LinkedInURL")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsPublished")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_published");
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
 
-                    b.Property<decimal?>("MaxInvestmentSize")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("max_investment_size");
+                    b.Property<string>("ProfilePhotoURL")
+                        .HasColumnType("text");
 
-                    b.Property<decimal?>("MinInvestmentSize")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("min_investment_size");
-
-                    b.Property<string>("OrganizationName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("organization_name");
-
-                    b.Property<string>("PortfolioCompanies")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("portfolio_companies");
-
-                    b.Property<string>("PreferredIndustries")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("preferred_industries");
-
-                    b.Property<string>("PreferredStages")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("preferred_stages");
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Website")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("website");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("InvestorID");
 
-                    b.HasIndex("IsPublished")
-                        .HasDatabaseName("ix_investor_profiles_is_published");
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_investor_profiles_user_id");
+                    b.ToTable("Investors");
+                });
 
-                    b.ToTable("investor_profiles", (string)null);
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorIndustryFocus", b =>
+                {
+                    b.Property<int>("FocusID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FocusID"));
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("FocusID");
+
+                    b.HasIndex("InvestorID");
+
+                    b.ToTable("InvestorIndustryFocuses");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorPreferences", b =>
+                {
+                    b.Property<int>("PreferenceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PreferenceID"));
+
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("MaxInvestmentSize")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("MinInvestmentSize")
+                        .HasColumnType("numeric");
+
+                    b.Property<float?>("MinPotentialScore")
+                        .HasColumnType("real");
+
+                    b.Property<string>("PreferredGeographies")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreferredIndustries")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreferredStages")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("PreferenceID");
+
+                    b.HasIndex("InvestorID")
+                        .IsUnique();
+
+                    b.ToTable("InvestorPreferences");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorStageFocus", b =>
+                {
+                    b.Property<int>("StageFocusID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StageFocusID"));
+
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Stage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("StageFocusID");
+
+                    b.HasIndex("InvestorID");
+
+                    b.ToTable("InvestorStageFocuses");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.InvestorWatchlist", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("WatchlistID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WatchlistID"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("InvestorProfileId")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<DateTime?>("LastNotifiedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsNotificationEnabled")
-                        .HasColumnType("bit");
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastViewedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("RemovedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("StartupID")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
+                    b.Property<string>("WatchReason")
+                        .HasColumnType("text");
 
-                    b.Property<int>("StartupProfileId")
-                        .HasColumnType("int");
+                    b.HasKey("WatchlistID");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("InvestorID");
 
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvestorProfileId");
-
-                    b.HasIndex("StartupProfileId");
+                    b.HasIndex("StartupID");
 
                     b.ToTable("InvestorWatchlists");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipSession", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipFeedback", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("FeedbackID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeedbackID"));
 
-                    b.Property<string>("ActionItems")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("FromRole")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("ConnectionId")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MentorshipID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SessionID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("FeedbackID");
+
+                    b.HasIndex("MentorshipID");
+
+                    b.HasIndex("SessionID");
+
+                    b.ToTable("MentorshipFeedbacks");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipReport", b =>
+                {
+                    b.Property<int>("ReportID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReportID"));
+
+                    b.Property<string>("AttachmentsURL")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("CreatedByAdvisorID")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("DurationMinutes")
-                        .HasColumnType("int");
+                    b.Property<string>("DetailedFindings")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
+                    b.Property<bool>("IsMandatory")
+                        .HasColumnType("boolean");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<int>("MentorshipID")
+                        .HasColumnType("integer");
 
-                    b.Property<int?>("ProductivityRating")
-                        .HasColumnType("int");
+                    b.Property<string>("Recommendations")
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("ScheduledAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("ReportSummary")
+                        .HasColumnType("text");
 
-                    b.Property<string>("SessionNotes")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("ReviewedByStaff")
+                        .HasColumnType("boolean");
 
-                    b.Property<string>("Topic")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("SessionID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ReportID");
+
+                    b.HasIndex("MentorshipID");
+
+                    b.HasIndex("SessionID");
+
+                    b.ToTable("MentorshipReports");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipSession", b =>
+                {
+                    b.Property<int>("SessionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SessionID"));
+
+                    b.Property<string>("ActionItems")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("AdvisorConfirmedConductedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AdvisorInternalNotes")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ConductedConfirmedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("KeyInsights")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MeetingURL")
+                        .HasColumnType("text");
+
+                    b.Property<int>("MentorshipID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NextSteps")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RecommendedResources")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ScheduledStartAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SessionFormat")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SessionStatus")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("StartupConfirmedConductedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("StartupNotes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TopicsDiscussed")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("SessionID");
 
-                    b.HasIndex("ConnectionId");
+                    b.HasIndex("MentorshipID");
 
                     b.ToTable("MentorshipSessions");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.Message", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("MessageID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageID"));
 
-                    b.Property<string>("AttachmentType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("AttachmentURLs")
+                        .HasColumnType("text");
 
-                    b.Property<string>("AttachmentUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ConnectionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<int>("ConversationID")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MessageText")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ReadAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("int");
+                    b.Property<int>("SenderUserID")
+                        .HasColumnType("integer");
 
-                    b.Property<int?>("ReplyToMessageId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
+                    b.HasKey("MessageID");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("ConversationID");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConnectionId");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("ReplyToMessageId");
-
-                    b.HasIndex("SenderId");
+                    b.HasIndex("SenderUserID");
 
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("AISEP.Domain.Entities.ModerationAction", b =>
+                {
+                    b.Property<int>("ActionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ActionID"));
+
+                    b.Property<string>("ActionDetails")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ActionTakenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ActionTakenBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FlagID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FlaggedContentFlagID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MessageToUser")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TargetUserID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ActionID");
+
+                    b.HasIndex("ActionTakenBy");
+
+                    b.HasIndex("FlaggedContentFlagID");
+
+                    b.HasIndex("TargetUserID");
+
+                    b.ToTable("ModerationActions");
+                });
+
             modelBuilder.Entity("AISEP.Domain.Entities.Notification", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("NotificationID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationID"));
 
-                    b.Property<string>("ActionUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ActionURL")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsSent")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ReadAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("RelatedEntityId")
-                        .HasColumnType("int");
+                    b.Property<int?>("RelatedEntityID")
+                        .HasColumnType("integer");
 
                     b.Property<string>("RelatedEntityType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("SentAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.HasKey("NotificationID");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserID");
 
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.StartupProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.PasswordResetToken", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PasswordResetTokenID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PasswordResetTokenID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PasswordResetTokenID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Permission", b =>
+                {
+                    b.Property<int>("PermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PermissionID"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("PermissionID");
+
+                    b.ToTable("Permissions");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.PlatformAnalytics", b =>
+                {
+                    b.Property<int>("AnalyticID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AnalyticID"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("MetricDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MetricName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("MetricValue")
+                        .HasColumnType("real");
+
+                    b.HasKey("AnalyticID");
+
+                    b.ToTable("PlatformAnalytics");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.PortfolioCompany", b =>
+                {
+                    b.Property<int>("PortfolioID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PortfolioID"));
+
+                    b.Property<string>("CompanyLogoURL")
+                        .HasColumnType("text");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("company_name");
+                        .HasColumnType("text");
 
-                    b.Property<string>("CoverImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("cover_image_url");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
+                    b.Property<string>("CurrentStatus")
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("FoundingDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("founding_date");
+                    b.Property<DateTime?>("ExitDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal?>("FundingAmountSought")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("funding_amount_sought");
+                    b.Property<string>("ExitType")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("ExitValue")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Industry")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("industry");
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
+                    b.Property<decimal?>("InvestmentAmount")
+                        .HasColumnType("numeric");
 
-                    b.Property<bool>("IsPublished")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_published");
+                    b.Property<DateTime?>("InvestmentDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("location");
+                    b.Property<string>("InvestmentStage")
+                        .HasColumnType("text");
 
-                    b.Property<string>("LogoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("logo_url");
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Stage")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("stage");
+                    b.HasKey("PortfolioID");
 
-                    b.Property<int>("TeamSize")
-                        .HasColumnType("int")
-                        .HasColumnName("team_size");
+                    b.HasIndex("InvestorID");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("Website")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("website");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyName")
-                        .HasDatabaseName("ix_startup_profiles_company_name");
-
-                    b.HasIndex("Industry")
-                        .HasDatabaseName("ix_startup_profiles_industry");
-
-                    b.HasIndex("IsPublished")
-                        .HasDatabaseName("ix_startup_profiles_is_published");
-
-                    b.HasIndex("Stage")
-                        .HasDatabaseName("ix_startup_profiles_stage");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_startup_profiles_user_id");
-
-                    b.ToTable("startup_profiles", (string)null);
+                    b.ToTable("PortfolioCompanies");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.StartupScore", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.ProfileView", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ViewID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ViewID"));
 
-                    b.Property<DateTime>("CalculatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("ViewedAdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ViewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ViewedInvestorID")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ViewedStartupID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ViewerUserID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ViewID");
+
+                    b.HasIndex("ViewedAdvisorID");
+
+                    b.HasIndex("ViewedInvestorID");
+
+                    b.HasIndex("ViewedStartupID");
+
+                    b.HasIndex("ViewerUserID");
+
+                    b.ToTable("ProfileViews");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("RefreshTokenID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RefreshTokenID"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("FinancialsScore")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<string>("ReplacedByToken")
+                        .HasColumnType("text");
 
-                    b.Property<decimal>("MarketScore")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("OverallScore")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<decimal>("ProductScore")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("text");
 
-                    b.Property<string>("Reasoning")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Recommendations")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("RefreshTokenID");
 
-                    b.Property<int>("StartupProfileId")
-                        .HasColumnType("int");
+                    b.HasIndex("UserID");
 
-                    b.Property<decimal>("TeamScore")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TractionScore")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StartupProfileId");
-
-                    b.ToTable("StartupScores");
+                    b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.SystemConfig", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Role", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RoleID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RoleID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("RoleID");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PermissionID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoleID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("PermissionID");
+
+                    b.HasIndex("RoleID");
+
+                    b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.SavedReport", b =>
+                {
+                    b.Property<int>("ReportID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReportID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CreatedByUserUserID")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsScheduled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastGeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Parameters")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReportName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReportType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScheduleFrequency")
+                        .HasColumnType("text");
+
+                    b.HasKey("ReportID");
+
+                    b.HasIndex("CreatedByUserUserID");
+
+                    b.ToTable("SavedReports");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoreImprovementRecommendation", b =>
+                {
+                    b.Property<int>("RecommendationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RecommendationID"));
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DataType")
+                    b.Property<string>("ExpectedImpact")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PotentialScoreScoreID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Priority")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("RecommendationText")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ScoreID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("RecommendationID");
+
+                    b.HasIndex("PotentialScoreScoreID");
+
+                    b.ToTable("ScoreImprovementRecommendations");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoreSubMetric", b =>
+                {
+                    b.Property<int>("SubMetricID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SubMetricID"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Explanation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetricName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("MetricScore")
+                        .HasColumnType("real");
+
+                    b.Property<string>("MetricValue")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PotentialScoreScoreID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ScoreID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SubMetricID");
+
+                    b.HasIndex("PotentialScoreScoreID");
+
+                    b.ToTable("ScoreSubMetrics");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoringModelConfiguration", b =>
+                {
+                    b.Property<int>("ConfigID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ConfigID"));
+
+                    b.Property<DateTime?>("ActivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ApplicableStage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ChangeNotes")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CreatedByUserUserID")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("FinancialWeight")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<float>("MarketWeight")
+                        .HasColumnType("real");
+
+                    b.Property<float>("ProductWeight")
+                        .HasColumnType("real");
+
+                    b.Property<float>("TeamWeight")
+                        .HasColumnType("real");
+
+                    b.Property<float>("TractionWeight")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ConfigID");
+
+                    b.HasIndex("CreatedByUserUserID");
+
+                    b.ToTable("ScoringModelConfigurations");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Startup", b =>
+                {
+                    b.Property<int>("StartupID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StartupID"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ApprovedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CoverImageURL")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CurrentFundingRaised")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<DateTime?>("FoundedDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsEditable")
-                        .HasColumnType("bit");
+                    b.Property<decimal?>("FundingAmountSought")
+                        .HasColumnType("numeric");
 
-                    b.Property<bool>("IsEncrypted")
-                        .HasColumnType("bit");
+                    b.Property<string>("FundingStage")
+                        .HasColumnType("text");
 
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Industry")
+                        .HasColumnType("text");
 
-                    b.Property<int?>("ModifiedByUserId")
-                        .HasColumnType("int");
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LogoURL")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OneLiner")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ProfileCompleteness")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProfileStatus")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Stage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubIndustry")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TeamSize")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Value")
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("Valuation")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("text");
+
+                    b.HasKey("StartupID");
+
+                    b.HasIndex("ApprovedBy");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.ToTable("Startups");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupAdvisorMentorship", b =>
+                {
+                    b.Property<int>("MentorshipID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MentorshipID"));
+
+                    b.Property<DateTime?>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("AdvisorID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ChallengeDescription")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("CompletionConfirmedByAdvisor")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CompletionConfirmedByStartup")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExpectedDuration")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExpectedScope")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastUpdatedByRole")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MentorshipStatus")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<string>("ObligationSummary")
+                        .HasColumnType("text");
 
-                    b.HasIndex("ModifiedByUserId");
+                    b.Property<string>("PreferredFormat")
+                        .HasColumnType("text");
 
-                    b.ToTable("SystemConfigs");
+                    b.Property<DateTime?>("RejectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RejectedReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SpecificQuestions")
+                        .HasColumnType("text");
+
+                    b.Property<int>("StartupID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("MentorshipID");
+
+                    b.HasIndex("AdvisorID");
+
+                    b.HasIndex("StartupID");
+
+                    b.ToTable("StartupAdvisorMentorships");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupInvestorConnection", b =>
+                {
+                    b.Property<int>("ConnectionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ConnectionID"));
+
+                    b.Property<string>("AttachedDocumentIDs")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConnectionStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("InitiatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InvestorID")
+                        .HasColumnType("integer");
+
+                    b.Property<float?>("MatchScore")
+                        .HasColumnType("real");
+
+                    b.Property<string>("PersonalizedMessage")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("RespondedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StartupID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ConnectionID");
+
+                    b.HasIndex("InvestorID");
+
+                    b.HasIndex("StartupID");
+
+                    b.ToTable("StartupInvestorConnections");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupPotentialScore", b =>
+                {
+                    b.Property<int>("ScoreID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ScoreID"));
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ConfigID")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("FinancialScore")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("IsCurrentScore")
+                        .HasColumnType("boolean");
+
+                    b.Property<float>("MarketScore")
+                        .HasColumnType("real");
+
+                    b.Property<float>("OverallScore")
+                        .HasColumnType("real");
+
+                    b.Property<float>("ProductScore")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("ScoringConfigurationConfigID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StartupID")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("TeamScore")
+                        .HasColumnType("real");
+
+                    b.Property<float>("TractionScore")
+                        .HasColumnType("real");
+
+                    b.HasKey("ScoreID");
+
+                    b.HasIndex("ScoringConfigurationConfigID");
+
+                    b.HasIndex("StartupID");
+
+                    b.ToTable("StartupPotentialScores");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.SystemSettings", b =>
+                {
+                    b.Property<int>("SettingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SettingID"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SettingKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SettingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UpdatedByUserUserID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SettingID");
+
+                    b.HasIndex("UpdatedByUserUserID");
+
+                    b.ToTable("SystemSettings");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.TeamMember", b =>
+                {
+                    b.Property<int>("TeamMemberID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TeamMemberID"));
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsFounder")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LinkedInURL")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhotoURL")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("text");
+
+                    b.Property<int>("StartupID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.HasKey("TeamMemberID");
+
+                    b.HasIndex("StartupID");
+
+                    b.ToTable("TeamMembers");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserID"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("email");
+                        .HasColumnType("text");
 
                     b.Property<bool>("EmailVerified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("email_verified");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("full_name");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
+                        .HasColumnType("boolean");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("password_hash");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("phone_number");
-
-                    b.Property<string>("ProfileImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("profile_image_url");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("role");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_email");
+                    b.HasKey("UserID");
 
-                    b.HasIndex("IsActive")
-                        .HasDatabaseName("ix_users_is_active");
-
-                    b.HasIndex("Role")
-                        .HasDatabaseName("ix_users_role");
-
-                    b.ToTable("users", (string)null);
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.UserRole", b =>
+                {
+                    b.Property<int>("UserRoleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserRoleID"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("AssignedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoleID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserRoleID");
+
+                    b.HasIndex("AssignedBy");
+
+                    b.HasIndex("RoleID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("UserRoles");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Advisor", b =>
                 {
                     b.HasOne("AISEP.Domain.Entities.User", "User")
-                        .WithOne("AdvisorProfile")
-                        .HasForeignKey("AISEP.Domain.Entities.AdvisorProfile", "UserId")
+                        .WithOne("Advisor")
+                        .HasForeignKey("AISEP.Domain.Entities.Advisor", "UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorAchievement", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "Advisor")
+                        .WithMany("Achievements")
+                        .HasForeignKey("AdvisorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Advisor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorAvailability", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "Advisor")
+                        .WithOne("Availability")
+                        .HasForeignKey("AISEP.Domain.Entities.AdvisorAvailability", "AdvisorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Advisor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorExpertise", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "Advisor")
+                        .WithMany("Expertise")
+                        .HasForeignKey("AdvisorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Advisor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorIndustryFocus", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "Advisor")
+                        .WithMany("IndustryFocus")
+                        .HasForeignKey("AdvisorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Advisor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorTestimonial", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "Advisor")
+                        .WithMany("Testimonials")
+                        .HasForeignKey("AdvisorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.StartupAdvisorMentorship", "Mentorship")
+                        .WithMany("Testimonials")
+                        .HasForeignKey("MentorshipID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
+                        .WithMany("AdvisorTestimonials")
+                        .HasForeignKey("StartupID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Advisor");
+
+                    b.Navigation("Mentorship");
+
+                    b.Navigation("Startup");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("AISEP.Domain.Entities.User", "User")
                         .WithMany("AuditLogs")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("UserID");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.BlockchainTransaction", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Conversation", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.Document", "Document")
-                        .WithOne("BlockchainTransaction")
-                        .HasForeignKey("AISEP.Domain.Entities.BlockchainTransaction", "DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("AISEP.Domain.Entities.StartupInvestorConnection", "Connection")
+                        .WithMany("Conversations")
+                        .HasForeignKey("ConnectionID");
 
-                    b.Navigation("Document");
-                });
+                    b.HasOne("AISEP.Domain.Entities.StartupAdvisorMentorship", "Mentorship")
+                        .WithMany("Conversations")
+                        .HasForeignKey("MentorshipID");
 
-            modelBuilder.Entity("AISEP.Domain.Entities.Connection", b =>
-                {
-                    b.HasOne("AISEP.Domain.Entities.AdvisorProfile", "AdvisorProfile")
-                        .WithMany("Connections")
-                        .HasForeignKey("AdvisorProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.Navigation("Connection");
 
-                    b.HasOne("AISEP.Domain.Entities.InvestorProfile", "InvestorProfile")
-                        .WithMany("Connections")
-                        .HasForeignKey("InvestorProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AISEP.Domain.Entities.StartupProfile", "StartupProfile")
-                        .WithMany("Connections")
-                        .HasForeignKey("StartupProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AdvisorProfile");
-
-                    b.Navigation("InvestorProfile");
-
-                    b.Navigation("StartupProfile");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.ConsultationFeedback", b =>
-                {
-                    b.HasOne("AISEP.Domain.Entities.ConsultationReport", "ConsultationReport")
-                        .WithMany()
-                        .HasForeignKey("ConsultationReportId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.MentorshipSession", "MentorshipSession")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("MentorshipSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.User", "ProvidedByUser")
-                        .WithMany()
-                        .HasForeignKey("ProvidedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ConsultationReport");
-
-                    b.Navigation("MentorshipSession");
-
-                    b.Navigation("ProvidedByUser");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.ConsultationReport", b =>
-                {
-                    b.HasOne("AISEP.Domain.Entities.ConsultationRequest", "ConsultationRequest")
-                        .WithMany()
-                        .HasForeignKey("ConsultationRequestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.MentorshipSession", "MentorshipSession")
-                        .WithMany()
-                        .HasForeignKey("MentorshipSessionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.MentorshipSession", null)
-                        .WithOne("ConsultationReport")
-                        .HasForeignKey("AISEP.Domain.Entities.ConsultationReport", "MentorshipSessionId1");
-
-                    b.Navigation("ConsultationRequest");
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("MentorshipSession");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.ConsultationRequest", b =>
-                {
-                    b.HasOne("AISEP.Domain.Entities.AdvisorProfile", "AdvisorProfile")
-                        .WithMany("ConsultationRequests")
-                        .HasForeignKey("AdvisorProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.MentorshipSession", "MentorshipSession")
-                        .WithOne("ConsultationRequest")
-                        .HasForeignKey("AISEP.Domain.Entities.ConsultationRequest", "MentorshipSessionId");
-
-                    b.HasOne("AISEP.Domain.Entities.StartupProfile", "StartupProfile")
-                        .WithMany("ConsultationRequests")
-                        .HasForeignKey("StartupProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AdvisorProfile");
-
-                    b.Navigation("MentorshipSession");
-
-                    b.Navigation("StartupProfile");
+                    b.Navigation("Mentorship");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.Document", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.StartupProfile", "StartupProfile")
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
                         .WithMany("Documents")
-                        .HasForeignKey("StartupProfileId")
+                        .HasForeignKey("StartupID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("StartupProfile");
+                    b.Navigation("Startup");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.DocumentAnalysis", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.DocumentBlockchainProof", b =>
                 {
+                    b.HasOne("AISEP.Domain.Entities.User", "AnchoredByUser")
+                        .WithMany()
+                        .HasForeignKey("AnchoredByUserUserID");
+
                     b.HasOne("AISEP.Domain.Entities.Document", "Document")
-                        .WithOne("Analysis")
-                        .HasForeignKey("AISEP.Domain.Entities.DocumentAnalysis", "DocumentId")
+                        .WithOne("BlockchainProof")
+                        .HasForeignKey("AISEP.Domain.Entities.DocumentBlockchainProof", "DocumentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AnchoredByUser");
 
                     b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.InvestmentProposal", b =>
-                {
-                    b.HasOne("AISEP.Domain.Entities.InvestorProfile", "InvestorProfile")
-                        .WithMany("InvestmentProposals")
-                        .HasForeignKey("InvestorProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AISEP.Domain.Entities.StartupProfile", "StartupProfile")
-                        .WithMany("InvestmentProposals")
-                        .HasForeignKey("StartupProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("InvestorProfile");
-
-                    b.Navigation("StartupProfile");
-                });
-
-            modelBuilder.Entity("AISEP.Domain.Entities.InvestorProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.EmailOtp", b =>
                 {
                     b.HasOne("AISEP.Domain.Entities.User", "User")
-                        .WithOne("InvestorProfile")
-                        .HasForeignKey("AISEP.Domain.Entities.InvestorProfile", "UserId")
+                        .WithMany("EmailOtps")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.InvestorWatchlist", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.FlaggedContent", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.InvestorProfile", "InvestorProfile")
-                        .WithMany("Watchlist")
-                        .HasForeignKey("InvestorProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("AISEP.Domain.Entities.User", "RelatedUser")
+                        .WithMany()
+                        .HasForeignKey("RelatedUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AISEP.Domain.Entities.StartupProfile", "StartupProfile")
-                        .WithMany("WatchedBy")
-                        .HasForeignKey("StartupProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("AISEP.Domain.Entities.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("InvestorProfile");
+                    b.Navigation("RelatedUser");
 
-                    b.Navigation("StartupProfile");
+                    b.Navigation("ReviewedByUser");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipSession", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Industry", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.Connection", "Connection")
-                        .WithMany()
-                        .HasForeignKey("ConnectionId")
+                    b.HasOne("AISEP.Domain.Entities.Industry", "ParentIndustry")
+                        .WithMany("SubIndustries")
+                        .HasForeignKey("ParentIndustryID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentIndustry");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.IndustryTrend", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Industry", "Industry")
+                        .WithMany("Trends")
+                        .HasForeignKey("IndustryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Industry");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InformationRequest", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.StartupInvestorConnection", "Connection")
+                        .WithMany("InformationRequests")
+                        .HasForeignKey("ConnectionID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithMany("InformationRequests")
+                        .HasForeignKey("InvestorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Connection");
+
+                    b.Navigation("Investor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Investor", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "User")
+                        .WithOne("Investor")
+                        .HasForeignKey("AISEP.Domain.Entities.Investor", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorIndustryFocus", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithMany("IndustryFocus")
+                        .HasForeignKey("InvestorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Investor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorPreferences", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithOne("Preferences")
+                        .HasForeignKey("AISEP.Domain.Entities.InvestorPreferences", "InvestorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Investor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorStageFocus", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithMany("StageFocus")
+                        .HasForeignKey("InvestorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Investor");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.InvestorWatchlist", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithMany("Watchlists")
+                        .HasForeignKey("InvestorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
+                        .WithMany("WatchedByInvestors")
+                        .HasForeignKey("StartupID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Investor");
+
+                    b.Navigation("Startup");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipFeedback", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.StartupAdvisorMentorship", "Mentorship")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("MentorshipID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.MentorshipSession", "Session")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("SessionID");
+
+                    b.Navigation("Mentorship");
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipReport", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.StartupAdvisorMentorship", "Mentorship")
+                        .WithMany("Reports")
+                        .HasForeignKey("MentorshipID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.MentorshipSession", "Session")
+                        .WithMany("Reports")
+                        .HasForeignKey("SessionID");
+
+                    b.Navigation("Mentorship");
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.MentorshipSession", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.StartupAdvisorMentorship", "Mentorship")
+                        .WithMany("Sessions")
+                        .HasForeignKey("MentorshipID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mentorship");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.Message", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.Connection", "Connection")
-                        .WithMany()
-                        .HasForeignKey("ConnectionId");
-
-                    b.HasOne("AISEP.Domain.Entities.User", "Receiver")
-                        .WithMany("ReceivedMessages")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("AISEP.Domain.Entities.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationID")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AISEP.Domain.Entities.Message", "ReplyToMessage")
-                        .WithMany()
-                        .HasForeignKey("ReplyToMessageId");
-
-                    b.HasOne("AISEP.Domain.Entities.User", "Sender")
+                    b.HasOne("AISEP.Domain.Entities.User", "SenderUser")
                         .WithMany("SentMessages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("SenderUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Connection");
+                    b.Navigation("Conversation");
 
-                    b.Navigation("Receiver");
+                    b.Navigation("SenderUser");
+                });
 
-                    b.Navigation("ReplyToMessage");
+            modelBuilder.Entity("AISEP.Domain.Entities.ModerationAction", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "ActionTakenByUser")
+                        .WithMany()
+                        .HasForeignKey("ActionTakenBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Sender");
+                    b.HasOne("AISEP.Domain.Entities.FlaggedContent", "FlaggedContent")
+                        .WithMany("ModerationActions")
+                        .HasForeignKey("FlaggedContentFlagID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.User", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ActionTakenByUser");
+
+                    b.Navigation("FlaggedContent");
+
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("AISEP.Domain.Entities.User", "User")
                         .WithMany("Notifications")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.StartupProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.HasOne("AISEP.Domain.Entities.User", "User")
-                        .WithOne("StartupProfile")
-                        .HasForeignKey("AISEP.Domain.Entities.StartupProfile", "UserId")
+                        .WithMany("PasswordResetTokens")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.StartupScore", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.PortfolioCompany", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.StartupProfile", "StartupProfile")
-                        .WithMany("Scores")
-                        .HasForeignKey("StartupProfileId")
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithMany("PortfolioCompanies")
+                        .HasForeignKey("InvestorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("StartupProfile");
+                    b.Navigation("Investor");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.SystemConfig", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.ProfileView", b =>
                 {
-                    b.HasOne("AISEP.Domain.Entities.User", "ModifiedByUser")
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "ViewedAdvisor")
+                        .WithMany("ProfileViews")
+                        .HasForeignKey("ViewedAdvisorID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AISEP.Domain.Entities.Investor", "ViewedInvestor")
+                        .WithMany("ProfileViews")
+                        .HasForeignKey("ViewedInvestorID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AISEP.Domain.Entities.Startup", "ViewedStartup")
+                        .WithMany("ProfileViews")
+                        .HasForeignKey("ViewedStartupID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AISEP.Domain.Entities.User", "ViewerUser")
+                        .WithMany("ProfileViewsAsViewer")
+                        .HasForeignKey("ViewerUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ViewedAdvisor");
+
+                    b.Navigation("ViewedInvestor");
+
+                    b.Navigation("ViewedStartup");
+
+                    b.Navigation("ViewerUser");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.RolePermission", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.SavedReport", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "CreatedByUser")
                         .WithMany()
-                        .HasForeignKey("ModifiedByUserId");
+                        .HasForeignKey("CreatedByUserUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("ModifiedByUser");
+                    b.Navigation("CreatedByUser");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.AdvisorProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoreImprovementRecommendation", b =>
                 {
-                    b.Navigation("Connections");
+                    b.HasOne("AISEP.Domain.Entities.StartupPotentialScore", "PotentialScore")
+                        .WithMany("ImprovementRecommendations")
+                        .HasForeignKey("PotentialScoreScoreID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("ConsultationRequests");
+                    b.Navigation("PotentialScore");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoreSubMetric", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.StartupPotentialScore", "PotentialScore")
+                        .WithMany("SubMetrics")
+                        .HasForeignKey("PotentialScoreScoreID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PotentialScore");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoringModelConfiguration", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserUserID");
+
+                    b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Startup", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AISEP.Domain.Entities.User", "User")
+                        .WithOne("Startup")
+                        .HasForeignKey("AISEP.Domain.Entities.Startup", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupAdvisorMentorship", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Advisor", "Advisor")
+                        .WithMany("Mentorships")
+                        .HasForeignKey("AdvisorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
+                        .WithMany("Mentorships")
+                        .HasForeignKey("StartupID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Advisor");
+
+                    b.Navigation("Startup");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupInvestorConnection", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Investor", "Investor")
+                        .WithMany("StartupConnections")
+                        .HasForeignKey("InvestorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
+                        .WithMany("InvestorConnections")
+                        .HasForeignKey("StartupID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Investor");
+
+                    b.Navigation("Startup");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupPotentialScore", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.ScoringModelConfiguration", "ScoringConfiguration")
+                        .WithMany("PotentialScores")
+                        .HasForeignKey("ScoringConfigurationConfigID");
+
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
+                        .WithMany("PotentialScores")
+                        .HasForeignKey("StartupID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScoringConfiguration");
+
+                    b.Navigation("Startup");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.SystemSettings", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserUserID");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.TeamMember", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.Startup", "Startup")
+                        .WithMany("TeamMembers")
+                        .HasForeignKey("StartupID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Startup");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.UserRole", b =>
+                {
+                    b.HasOne("AISEP.Domain.Entities.User", "AssignedByUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AISEP.Domain.Entities.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AISEP.Domain.Entities.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedByUser");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Advisor", b =>
+                {
+                    b.Navigation("Achievements");
+
+                    b.Navigation("Availability");
+
+                    b.Navigation("Expertise");
+
+                    b.Navigation("IndustryFocus");
+
+                    b.Navigation("Mentorships");
+
+                    b.Navigation("ProfileViews");
+
+                    b.Navigation("Testimonials");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Conversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.Document", b =>
                 {
-                    b.Navigation("Analysis");
-
-                    b.Navigation("BlockchainTransaction");
+                    b.Navigation("BlockchainProof");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.InvestorProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.FlaggedContent", b =>
                 {
-                    b.Navigation("Connections");
+                    b.Navigation("ModerationActions");
+                });
 
-                    b.Navigation("InvestmentProposals");
+            modelBuilder.Entity("AISEP.Domain.Entities.Industry", b =>
+                {
+                    b.Navigation("SubIndustries");
 
-                    b.Navigation("Watchlist");
+                    b.Navigation("Trends");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Investor", b =>
+                {
+                    b.Navigation("IndustryFocus");
+
+                    b.Navigation("InformationRequests");
+
+                    b.Navigation("PortfolioCompanies");
+
+                    b.Navigation("Preferences");
+
+                    b.Navigation("ProfileViews");
+
+                    b.Navigation("StageFocus");
+
+                    b.Navigation("StartupConnections");
+
+                    b.Navigation("Watchlists");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.MentorshipSession", b =>
                 {
-                    b.Navigation("ConsultationReport");
-
-                    b.Navigation("ConsultationRequest");
-
                     b.Navigation("Feedbacks");
+
+                    b.Navigation("Reports");
                 });
 
-            modelBuilder.Entity("AISEP.Domain.Entities.StartupProfile", b =>
+            modelBuilder.Entity("AISEP.Domain.Entities.Permission", b =>
                 {
-                    b.Navigation("Connections");
+                    b.Navigation("RolePermissions");
+                });
 
-                    b.Navigation("ConsultationRequests");
+            modelBuilder.Entity("AISEP.Domain.Entities.Role", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.ScoringModelConfiguration", b =>
+                {
+                    b.Navigation("PotentialScores");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.Startup", b =>
+                {
+                    b.Navigation("AdvisorTestimonials");
 
                     b.Navigation("Documents");
 
-                    b.Navigation("InvestmentProposals");
+                    b.Navigation("InvestorConnections");
 
-                    b.Navigation("Scores");
+                    b.Navigation("Mentorships");
 
-                    b.Navigation("WatchedBy");
+                    b.Navigation("PotentialScores");
+
+                    b.Navigation("ProfileViews");
+
+                    b.Navigation("TeamMembers");
+
+                    b.Navigation("WatchedByInvestors");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupAdvisorMentorship", b =>
+                {
+                    b.Navigation("Conversations");
+
+                    b.Navigation("Feedbacks");
+
+                    b.Navigation("Reports");
+
+                    b.Navigation("Sessions");
+
+                    b.Navigation("Testimonials");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupInvestorConnection", b =>
+                {
+                    b.Navigation("Conversations");
+
+                    b.Navigation("InformationRequests");
+                });
+
+            modelBuilder.Entity("AISEP.Domain.Entities.StartupPotentialScore", b =>
+                {
+                    b.Navigation("ImprovementRecommendations");
+
+                    b.Navigation("SubMetrics");
                 });
 
             modelBuilder.Entity("AISEP.Domain.Entities.User", b =>
                 {
-                    b.Navigation("AdvisorProfile");
+                    b.Navigation("Advisor");
 
                     b.Navigation("AuditLogs");
 
-                    b.Navigation("InvestorProfile");
+                    b.Navigation("EmailOtps");
+
+                    b.Navigation("Investor");
 
                     b.Navigation("Notifications");
 
-                    b.Navigation("ReceivedMessages");
+                    b.Navigation("PasswordResetTokens");
+
+                    b.Navigation("ProfileViewsAsViewer");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("SentMessages");
 
-                    b.Navigation("StartupProfile");
+                    b.Navigation("Startup");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }
