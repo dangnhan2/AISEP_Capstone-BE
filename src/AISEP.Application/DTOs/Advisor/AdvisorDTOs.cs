@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace AISEP.Application.DTOs.Advisor;
 
 // ========== REQUEST DTOs ==========
@@ -14,10 +16,11 @@ public class CreateAdvisorRequest
     public string? Title { get; set; }
     public string? Company { get; set; }
     public string? Bio { get; set; }
-    public string? ProfilePhotoURL { get; set; }
+    public IFormFile? ProfilePhotoURL { get; set; }
     public string? Website { get; set; }
     public string? LinkedInURL { get; set; }
     public string? MentorshipPhilosophy { get; set; }
+    public List<ExpertiseItemDto> Items { get; set; } = new();
 }
 
 /// <summary>
@@ -29,10 +32,11 @@ public class UpdateAdvisorRequest
     public string? Title { get; set; }
     public string? Company { get; set; }
     public string? Bio { get; set; }
-    public string? ProfilePhotoURL { get; set; }
+    public IFormFile? ProfilePhotoURL { get; set; }
     public string? Website { get; set; }
     public string? LinkedInURL { get; set; }
     public string? MentorshipPhilosophy { get; set; }
+    public List<ExpertiseItemDto> Items { get; set; } = new();
 }
 
 /// <summary>
