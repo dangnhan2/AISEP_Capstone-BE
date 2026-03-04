@@ -55,16 +55,22 @@ try
 
 // Add services to the container.
 
-// CORS — allow FE origin(s) with credentials (cookies)
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:3000" };
+// CORS — allow all origins
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
+    });
+    
+    // Allow all origins for hash/blockchain endpoints
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -72,6 +78,8 @@ builder.Services.AddCors(options =>
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.Configure<EthereumSettings>(builder.Configuration.GetSection("Ethereum"));
+
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -95,6 +103,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IModerationService, ModerationService>();
 builder.Services.AddScoped<IBlockchainProofService, BlockchainProofService>();
 builder.Services.AddSingleton<IBlockchainService, StubBlockchainService>(); // TODO: swap with real blockchain RPC for production
+builder.Services.AddSingleton<EthereumBlockchainService>(); // Real Ethereum blockchain service for hash operations
 
 
 // Storage (local file system for dev — swap to Azure Blob / S3 for production)
