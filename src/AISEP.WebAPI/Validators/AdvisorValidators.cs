@@ -102,10 +102,6 @@ public class UpdateExpertiseRequestValidator : AbstractValidator<UpdateExpertise
                 .MaximumLength(200).WithMessage("SubTopic must not exceed 200 characters.")
                 .When(e => e.SubTopic != null);
 
-            item.RuleFor(e => e.ProficiencyLevel)
-                .MaximumLength(50).WithMessage("Proficiency level must not exceed 50 characters.")
-                .When(e => e.ProficiencyLevel != null);
-
             item.RuleFor(e => e.YearsOfExperience)
                 .GreaterThanOrEqualTo(0).WithMessage("Years of experience must be >= 0.")
                 .When(e => e.YearsOfExperience.HasValue);

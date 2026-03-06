@@ -1,4 +1,5 @@
 using AISEP.Application.DTOs.Common;
+using AISEP.Application.DTOs.QueryParams;
 using AISEP.Application.DTOs.Startup;
 using AISEP.Application.Interfaces;
 using AISEP.WebAPI.Extensions;
@@ -62,7 +63,7 @@ public class StartupsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<StartupMeDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<StartupMeDto>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<StartupMeDto>), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateStartup([FromBody] CreateStartupRequest request)
+    public async Task<IActionResult> CreateStartup([FromForm] CreateStartupRequest request)
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.CreateStartupAsync(userId, request);
@@ -91,7 +92,7 @@ public class StartupsController : ControllerBase
     [Authorize(Policy = "StartupOnly")]
     [ProducesResponseType(typeof(ApiResponse<StartupMeDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<StartupMeDto>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateMyStartup([FromBody] UpdateStartupRequest request)
+    public async Task<IActionResult> UpdateMyStartup([FromForm] UpdateStartupRequest request)
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.UpdateStartupAsync(userId, request);
@@ -157,14 +158,9 @@ public class StartupsController : ControllerBase
     [HttpGet]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<PagedResponse<StartupListItemDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchStartups(
-        [FromQuery] string? q = null,
-        [FromQuery] string? industry = null,
-        [FromQuery] string? stage = null,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> SearchStartups([FromQuery] StartupQueryParams queryParams)
     {
-        var result = await _startupService.SearchStartupsAsync(q, industry, stage, page, pageSize);
+        var result = await _startupService.SearchStartupsAsync(queryParams);
         return result.ToPagedEnvelope();
     }
 
@@ -194,7 +190,7 @@ public class StartupsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<TeamMemberDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<TeamMemberDto>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<TeamMemberDto>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddTeamMember([FromBody] CreateTeamMemberRequest request)
+    public async Task<IActionResult> AddTeamMember([FromForm] CreateTeamMemberRequest request)
     {
         var userId = GetCurrentUserId();
         var result = await _startupService.AddTeamMemberAsync(userId, request);
@@ -205,28 +201,28 @@ public class StartupsController : ControllerBase
     /// <summary>
     /// Update a team member of current user's startup
     /// </summary>
-    [HttpPut("me/team-members/{teamMemberId:int}")]
+    [HttpPut("me/team-members")]
     [Authorize(Policy = "StartupOnly")]
     [ProducesResponseType(typeof(ApiResponse<TeamMemberDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<TeamMemberDto>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateTeamMember(int teamMemberId, [FromBody] UpdateTeamMemberRequest request)
+    public async Task<IActionResult> UpdateTeamMember([FromForm] UpdateTeamMemberRequest request)
     {
         var userId = GetCurrentUserId();
-        var result = await _startupService.UpdateTeamMemberAsync(userId, teamMemberId, request);
+        var result = await _startupService.UpdateTeamMemberAsync(userId, request);
         return result.ToActionResult();
     }
 
     /// <summary>
     /// Delete a team member from current user's startup
     /// </summary>
-    [HttpDelete("me/team-members/{teamMemberId:int}")]
+    [HttpDelete("me/team-members")]
     [Authorize(Policy = "StartupOnly")]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteTeamMember(int teamMemberId)
+    public async Task<IActionResult> DeleteTeamMember(int memberId)
     {
         var userId = GetCurrentUserId();
-        var result = await _startupService.DeleteTeamMemberAsync(userId, teamMemberId);
+        var result = await _startupService.DeleteTeamMemberAsync(userId, memberId);
         return result.ToActionResult();
     }
 }
