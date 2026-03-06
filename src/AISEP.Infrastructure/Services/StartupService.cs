@@ -1,8 +1,11 @@
 using AISEP.Application.DTOs.Common;
+using AISEP.Application.DTOs.QueryParams;
 using AISEP.Application.DTOs.Startup;
+using AISEP.Application.Extension;
 using AISEP.Application.Interfaces;
 using AISEP.Domain.Entities;
 using AISEP.Domain.Enums;
+using AISEP.Infrastructure.Constant;
 using AISEP.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,12 +17,14 @@ public class StartupService : IStartupService
     private readonly ApplicationDbContext _context;
     private readonly IAuditService _auditService;
     private readonly ILogger<StartupService> _logger;
+    private readonly ICloudinaryService _cloudinaryService;
 
-    public StartupService(ApplicationDbContext context, IAuditService auditService, ILogger<StartupService> logger)
+    public StartupService(ApplicationDbContext context, IAuditService auditService, ILogger<StartupService> logger, ICloudinaryService cloudinaryService)
     {
         _context = context;
         _auditService = auditService;
         _logger = logger;
+        _cloudinaryService = cloudinaryService;
     }
 
     // ========== STARTUP PROFILE ==========
@@ -33,6 +38,8 @@ public class StartupService : IStartupService
             return ApiResponse<StartupMeDto>.ErrorResponse("STARTUP_PROFILE_EXISTS",
                 "You already have a startup profile. Each user can only create one startup.");
         }
+
+        var logoUrl = await _cloudinaryService.UploadImage(request.LogoURL, CloudinarySavingFolder.LogoFolder);
 
         // Validate industry exists in master data
         if (request.IndustryID.HasValue)
@@ -48,7 +55,7 @@ public class StartupService : IStartupService
             }
         }
 
-        var startup = new Domain.Entities.Startup
+        var startup = new Startup
         {
             UserID = userId,
             CompanyName = request.CompanyName,
@@ -56,7 +63,7 @@ public class StartupService : IStartupService
             Description = request.Description,
             IndustryID = request.IndustryID,
             SubIndustry = request.SubIndustry,
-            Stage = !string.IsNullOrWhiteSpace(request.Stage) && Enum.TryParse<StartupStage>(request.Stage, true, out var stageVal) ? stageVal : null,
+            Stage = request.Stage,
             FoundedDate = request.FoundedDate.HasValue
                 ? DateTime.SpecifyKind(request.FoundedDate.Value, DateTimeKind.Utc)
                 : null,
@@ -64,6 +71,7 @@ public class StartupService : IStartupService
             Location = request.Location,
             Country = request.Country,
             Website = request.Website,
+            LogoURL = logoUrl,
             FundingAmountSought = request.FundingAmountSought,
             CurrentFundingRaised = request.CurrentFundingRaised,
             Valuation = request.Valuation,
@@ -72,7 +80,7 @@ public class StartupService : IStartupService
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Startups.Add(startup);
+            _context.Startups.Add(startup);
         await _context.SaveChangesAsync();
 
         await _auditService.LogAsync("CREATE_STARTUP", "Startup", startup.StartupID,
@@ -110,6 +118,13 @@ public class StartupService : IStartupService
                 "You haven't created a startup profile yet.");
         }
 
+        if (request.LogoURL != null)
+        {
+            var logoUrl = await _cloudinaryService.UploadImage(request.LogoURL, CloudinarySavingFolder.LogoFolder);
+            await _cloudinaryService.DeleteImage(startup.LogoURL);
+            startup.LogoURL = logoUrl;
+        }
+
         // Validate industry if provided
         if (request.IndustryID.HasValue)
         {
@@ -129,20 +144,18 @@ public class StartupService : IStartupService
         if (request.OneLiner != null) startup.OneLiner = request.OneLiner;
         if (request.Description != null) startup.Description = request.Description;
         if (request.IndustryID.HasValue) startup.IndustryID = request.IndustryID;
-        if (request.SubIndustry != null) startup.SubIndustry = request.SubIndustry;
-        if (request.Stage != null && Enum.TryParse<StartupStage>(request.Stage, true, out var stageVal))
-            startup.Stage = stageVal;
+        if (request.SubIndustry != null) startup.SubIndustry = request.SubIndustry;          
         if (request.FoundedDate.HasValue) startup.FoundedDate = DateTime.SpecifyKind(request.FoundedDate.Value, DateTimeKind.Utc);
         if (request.TeamSize.HasValue) startup.TeamSize = request.TeamSize;
         if (request.Location != null) startup.Location = request.Location;
         if (request.Country != null) startup.Country = request.Country;
         if (request.Website != null) startup.Website = request.Website;
-        if (request.LogoURL != null) startup.LogoURL = request.LogoURL;
         if (request.CoverImageURL != null) startup.CoverImageURL = request.CoverImageURL;
         if (request.FundingAmountSought.HasValue) startup.FundingAmountSought = request.FundingAmountSought;
         if (request.CurrentFundingRaised.HasValue) startup.CurrentFundingRaised = request.CurrentFundingRaised;
         if (request.Valuation.HasValue) startup.Valuation = request.Valuation;
 
+        startup.Stage = request.Stage;
         startup.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -206,44 +219,25 @@ public class StartupService : IStartupService
         return ApiResponse<StartupPublicDto>.SuccessResponse(MapToPublicDto(startup));
     }
 
-    public async Task<ApiResponse<PagedResponse<StartupListItemDto>>> SearchStartupsAsync(
-        string? keyword, string? industry, string? stage,
-        int page, int pageSize)
+    public async Task<ApiResponse<PagedResponse<StartupListItemDto>>> SearchStartupsAsync(StartupQueryParams queryParams)
     {
-        // Clamp pageSize
-        if (pageSize < 1) pageSize = 20;
-        if (pageSize > 100) pageSize = 100;
-        if (page < 1) page = 1;
-
         var query = _context.Startups.AsNoTracking().AsQueryable();
 
-        // Keyword search on CompanyName
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            var lowerKeyword = keyword.ToLower();
-            query = query.Where(s => s.CompanyName.ToLower().Contains(lowerKeyword)
-                                  || (s.OneLiner != null && s.OneLiner.ToLower().Contains(lowerKeyword)));
-        }
-
-        // Filter by industry
-        if (!string.IsNullOrWhiteSpace(industry))
-        {
-            query = query.Where(s => s.Industry != null && s.Industry.IndustryName == industry);
-        }
-
+        if (!string.IsNullOrEmpty(queryParams.Keyword))      
+            query = query.Where(s => s.CompanyName.ToLower().Contains(queryParams.Keyword)
+            || s.Industry.IndustryName == queryParams.Keyword);      
+        
         // Filter by stage
-        if (!string.IsNullOrWhiteSpace(stage) && Enum.TryParse<StartupStage>(stage, true, out var stageFilter))
-        {
-            query = query.Where(s => s.Stage == stageFilter);
-        }
+        if (queryParams.Stage.HasValue)      
+            query = query.Where(s => s.Stage == queryParams.Stage.Value);
+        
 
         var totalItems = await query.CountAsync();
-        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+        var totalPages = (int)Math.Ceiling(totalItems / (double)queryParams.PageSize);
 
         var items = await query
             .OrderByDescending(s => s.UpdatedAt ?? s.CreatedAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+            .Paging(queryParams.Page, queryParams.PageSize)
             .Select(s => new StartupListItemDto
             {
                 StartupID = s.StartupID,
@@ -265,8 +259,8 @@ public class StartupService : IStartupService
             Items = items,
             Paging = new PagingInfo
             {
-                Page = page,
-                PageSize = pageSize,
+                Page = queryParams.Page,
+                PageSize = queryParams.PageSize,
                 TotalItems = totalItems,
                 TotalPages = totalPages
             }
@@ -275,7 +269,7 @@ public class StartupService : IStartupService
         return ApiResponse<PagedResponse<StartupListItemDto>>.SuccessResponse(result);
     }
 
-    // ========== TEAM MEMBERS ==========
+     //========== TEAM MEMBERS ==========
 
     public async Task<ApiResponse<List<TeamMemberDto>>> GetTeamMembersAsync(int userId)
     {
@@ -299,17 +293,21 @@ public class StartupService : IStartupService
         return ApiResponse<List<TeamMemberDto>>.SuccessResponse(members);
     }
 
-    public async Task<ApiResponse<TeamMemberDto>> AddTeamMemberAsync(int userId, CreateTeamMemberRequest request)
+    public async Task<ApiResponse<string>> AddTeamMemberAsync(int userId, CreateTeamMemberRequest request)
     {
-        var startup = await _context.Startups.FirstOrDefaultAsync(s => s.UserID == userId);
+        var startup = await _context.Startups
+            .Include(s => s.TeamMembers)
+            .FirstOrDefaultAsync(s => s.UserID == userId);
 
         if (startup == null)
         {
-            return ApiResponse<TeamMemberDto>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
+            return ApiResponse<string>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
                 "You haven't created a startup profile yet.");
         }
 
-        var member = new TeamMember
+        var photoUrl = await _cloudinaryService.UploadImage(request.PhotoURL, CloudinarySavingFolder.ProfilePicFolder);
+
+        var newMember = new TeamMember
         {
             StartupID = startup.StartupID,
             FullName = request.FullName,
@@ -317,87 +315,93 @@ public class StartupService : IStartupService
             Title = request.Title,
             LinkedInURL = request.LinkedInURL,
             Bio = request.Bio,
-            PhotoURL = request.PhotoURL,
+            PhotoURL = photoUrl,
             IsFounder = request.IsFounder,
             YearsOfExperience = request.YearsOfExperience,
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.TeamMembers.Add(member);
+
+        startup.TeamMembers.Add(newMember);      
+        
         await _context.SaveChangesAsync();
 
-        await _auditService.LogAsync("CREATE_TEAM_MEMBER", "TeamMember", member.TeamMemberID,
-            $"Added {member.FullName} to startup {startup.StartupID}");
-
-        return ApiResponse<TeamMemberDto>.SuccessResponse(MapToTeamMemberDto(member), "Team member added");
+        return ApiResponse<string>.SuccessResponse("", "Team member added");
     }
 
-    public async Task<ApiResponse<TeamMemberDto>> UpdateTeamMemberAsync(int userId, int teamMemberId, UpdateTeamMemberRequest request)
+    public async Task<ApiResponse<string>> UpdateTeamMemberAsync(int userId, UpdateTeamMemberRequest request)
     {
-        var startup = await _context.Startups.AsNoTracking().FirstOrDefaultAsync(s => s.UserID == userId);
-        if (startup == null)
-        {
-            return ApiResponse<TeamMemberDto>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
-                "You haven't created a startup profile yet.");
-        }
+        var startup = await _context.Startups
+            .AsNoTracking()
+            .Include(s => s.TeamMembers)
+            .FirstOrDefaultAsync(s => s.UserID == userId);
 
-        var member = await _context.TeamMembers.FirstOrDefaultAsync(
-            tm => tm.TeamMemberID == teamMemberId && tm.StartupID == startup.StartupID);
-
-        if (member == null)
-        {
-            return ApiResponse<TeamMemberDto>.ErrorResponse("TEAM_MEMBER_NOT_FOUND",
-                "Team member not found or does not belong to your startup.");
-        }
-
-        // Apply partial updates
-        if (request.FullName != null) member.FullName = request.FullName;
-        if (request.Role != null) member.Role = request.Role;
-        if (request.Title != null) member.Title = request.Title;
-        if (request.LinkedInURL != null) member.LinkedInURL = request.LinkedInURL;
-        if (request.Bio != null) member.Bio = request.Bio;
-        if (request.PhotoURL != null) member.PhotoURL = request.PhotoURL;
-        if (request.IsFounder.HasValue) member.IsFounder = request.IsFounder.Value;
-        if (request.YearsOfExperience.HasValue) member.YearsOfExperience = request.YearsOfExperience;
-
-        await _context.SaveChangesAsync();
-
-        await _auditService.LogAsync("UPDATE_TEAM_MEMBER", "TeamMember", member.TeamMemberID,
-            $"Updated {member.FullName} in startup {startup.StartupID}");
-
-        return ApiResponse<TeamMemberDto>.SuccessResponse(MapToTeamMemberDto(member), "Team member updated");
-    }
-
-    public async Task<ApiResponse<string>> DeleteTeamMemberAsync(int userId, int teamMemberId)
-    {
-        var startup = await _context.Startups.AsNoTracking().FirstOrDefaultAsync(s => s.UserID == userId);
         if (startup == null)
         {
             return ApiResponse<string>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
                 "You haven't created a startup profile yet.");
         }
 
-        var member = await _context.TeamMembers.FirstOrDefaultAsync(
-            tm => tm.TeamMemberID == teamMemberId && tm.StartupID == startup.StartupID);
+        var member = startup.TeamMembers.FirstOrDefault(x => x.TeamMemberID == request.MemberId);
 
         if (member == null)
         {
-            return ApiResponse<string>.ErrorResponse("TEAM_MEMBER_NOT_FOUND",
-                "Team member not found or does not belong to your startup.");
+            return ApiResponse<string>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
+                 "Member not found");
         }
 
-        _context.TeamMembers.Remove(member);
+        if (member.FullName != null) member.FullName = request.FullName;
+        if (member.Role != null) member.Role = request.Role;
+        if (member.Title != null) member.Title = request.Title;
+        if (member.LinkedInURL != null) member.LinkedInURL = request.LinkedInURL;
+        if (member.Bio != null) member.Bio = request.Bio;
+        if (member.IsFounder) member.IsFounder = request.IsFounder.Value;
+        if (member.YearsOfExperience.HasValue) member.YearsOfExperience = request.YearsOfExperience;
+
+        if (member.PhotoURL != null)
+        {
+            var photoUrl = await _cloudinaryService.UploadImage(request.PhotoURL, CloudinarySavingFolder.ProfilePicFolder);
+            await _cloudinaryService.DeleteImage(member.PhotoURL);
+            member.PhotoURL = photoUrl;
+        }
+        // Apply partial updates
+
         await _context.SaveChangesAsync();
 
-        await _auditService.LogAsync("DELETE_TEAM_MEMBER", "TeamMember", teamMemberId,
-            $"Removed {member.FullName} from startup {startup.StartupID}");
+        return ApiResponse<string>.SuccessResponse("", "Team member updated");
+    }
+
+    public async Task<ApiResponse<string>> DeleteTeamMemberAsync(int userId, int memberId)
+    {
+        var startup = await _context.Startups
+            .Include(x => x.TeamMembers)
+            .FirstOrDefaultAsync(x => x.UserID == userId);
+           
+        if (startup == null)
+        {
+            return ApiResponse<string>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
+                "You haven't created a startup profile yet.");
+        }
+
+        var member = startup.TeamMembers.FirstOrDefault(x => x.TeamMemberID == memberId);
+
+        if (member == null)
+        {
+            return ApiResponse<string>.ErrorResponse("STARTUP_PROFILE_NOT_FOUND",
+                 "Member not found");
+        }
+
+        startup.TeamMembers.Remove(member);
+
+        await _cloudinaryService.DeleteImage(member.PhotoURL);
+        await _context.SaveChangesAsync();
 
         return ApiResponse<string>.SuccessResponse("Team member deleted", "Team member removed successfully");
     }
 
     // ========== MAPPING HELPERS ==========
-
-    private static StartupMeDto MapToMeDto(Domain.Entities.Startup s)
+    #region helper method
+    private static StartupMeDto MapToMeDto(Startup s)
     {
         return new StartupMeDto
         {
@@ -429,7 +433,7 @@ public class StartupService : IStartupService
         };
     }
 
-    private static StartupPublicDto MapToPublicDto(Domain.Entities.Startup s)
+    private static StartupPublicDto MapToPublicDto(Startup s)
     {
         return new StartupPublicDto
         {
@@ -467,7 +471,8 @@ public class StartupService : IStartupService
     }
 
     private static TeamMemberDto MapToTeamMemberDto(TeamMember tm)
-    {
+    {   
+
         return new TeamMemberDto
         {
             TeamMemberID = tm.TeamMemberID,
@@ -494,4 +499,5 @@ public class StartupService : IStartupService
         var filled = fields.Count(f => f != null && f.ToString() != string.Empty);
         return (int)Math.Round(filled * 100.0 / fields.Length);
     }
+    #endregion
 }

@@ -1,9 +1,13 @@
+using AISEP.Domain.Enums;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json.Serialization;
+
 namespace AISEP.Application.DTOs.Startup;
 
 // ========== REQUEST DTOs ==========
 
 public class CreateStartupRequest
-{
+{   
     public string CompanyName { get; set; } = null!;
     public string? OneLiner { get; set; }
     public string? Description { get; set; }
@@ -11,12 +15,13 @@ public class CreateStartupRequest
     public int? IndustryID { get; set; }
     public string? SubIndustry { get; set; }
     /// <summary>Enum name: Idea, PreSeed, Seed, SeriesA, SeriesB, SeriesC, Growth</summary>
-    public string? Stage { get; set; }
+    public StartupStage Stage { get; set; }
     public DateTime? FoundedDate { get; set; }
     public int? TeamSize { get; set; }
     public string? Location { get; set; }
     public string? Country { get; set; }
     public string? Website { get; set; }
+    public IFormFile? LogoURL { get; set; }
     public decimal? FundingAmountSought { get; set; }
     public decimal? CurrentFundingRaised { get; set; }
     public decimal? Valuation { get; set; }
@@ -29,13 +34,13 @@ public class UpdateStartupRequest
     public string? Description { get; set; }
     public int? IndustryID { get; set; }
     public string? SubIndustry { get; set; }
-    public string? Stage { get; set; }
+    public StartupStage Stage { get; set; }
     public DateTime? FoundedDate { get; set; }
     public int? TeamSize { get; set; }
     public string? Location { get; set; }
     public string? Country { get; set; }
     public string? Website { get; set; }
-    public string? LogoURL { get; set; }
+    public IFormFile? LogoURL { get; set; }
     public string? CoverImageURL { get; set; }
     public decimal? FundingAmountSought { get; set; }
     public decimal? CurrentFundingRaised { get; set; }
@@ -151,19 +156,21 @@ public class CreateTeamMemberRequest
     public string? Title { get; set; }
     public string? LinkedInURL { get; set; }
     public string? Bio { get; set; }
-    public string? PhotoURL { get; set; }
+    public IFormFile? PhotoURL { get; set; }
     public bool IsFounder { get; set; }
     public int? YearsOfExperience { get; set; }
 }
 
 public class UpdateTeamMemberRequest
-{
+{   
+    public int MemberId { get; set; }
     public string? FullName { get; set; }
     public string? Role { get; set; }
     public string? Title { get; set; }
     public string? LinkedInURL { get; set; }
     public string? Bio { get; set; }
-    public string? PhotoURL { get; set; }
+    public IFormFile? PhotoURL { get; set; }
     public bool? IsFounder { get; set; }
     public int? YearsOfExperience { get; set; }
 }
+

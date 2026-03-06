@@ -3,6 +3,7 @@ using AISEP.Application.DTOs.Common;
 using AISEP.Application.Interfaces;
 using AISEP.Domain.Entities;
 using AISEP.Domain.Enums;
+using AISEP.Infrastructure.Constant;
 using AISEP.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ public class AdvisorService : IAdvisorService
     private readonly IAuditService _audit;
     private readonly ILogger<AdvisorService> _logger;
     private readonly ICloudinaryService _cloudinaryService;
-    private const string Folder = "ProfilePic";
+
     public AdvisorService(ApplicationDbContext db, IAuditService audit, ILogger<AdvisorService> logger, ICloudinaryService cloudinaryService)
     {
         _db = db;
@@ -35,7 +36,7 @@ public class AdvisorService : IAdvisorService
             return ApiResponse<AdvisorMeDto>.ErrorResponse("ADVISOR_PROFILE_EXISTS",
                 "Advisor profile already exists for this user.");
 
-        var profilePhotoUrl = await _cloudinaryService.UploadImage(request.ProfilePhotoURL, Folder);
+        var profilePhotoUrl = await _cloudinaryService.UploadImage(request.ProfilePhotoURL, CloudinarySavingFolder.ProfilePicFolder);
 
         var advisor = new Advisor
         {
@@ -107,7 +108,7 @@ public class AdvisorService : IAdvisorService
             return ApiResponse<AdvisorMeDto>.ErrorResponse("ADVISOR_PROFILE_NOT_FOUND",
                 "Advisor profile not found.");
 
-        var profilePhotoUrl = await _cloudinaryService.UploadImage(request.ProfilePhotoURL, Folder);
+        var profilePhotoUrl = await _cloudinaryService.UploadImage(request.ProfilePhotoURL, CloudinarySavingFolder.ProfilePicFolder);
 
         if (request.FullName != null) advisor.FullName = request.FullName;
         if (request.Title != null) advisor.Title = request.Title;
@@ -131,7 +132,7 @@ public class AdvisorService : IAdvisorService
                 AdvisorID = advisor.AdvisorID,
                 Category = item.Category,
                 SubTopic = item.SubTopic,
-                ProficiencyLevel = Enum.TryParse<ProficiencyLevel>(item.ProficiencyLevel, true, out var pl) ? pl : null,
+                ProficiencyLevel = item.ProficiencyLevel,
                 YearsOfExperience = item.YearsOfExperience
             };
 
@@ -139,14 +140,6 @@ public class AdvisorService : IAdvisorService
         }
 
         _db.Advisors.Update(advisor);
-
-        var result = newItems.Select(e => new ExpertiseItemDto
-        {
-            Category = e.Category,
-            SubTopic = e.SubTopic,
-            ProficiencyLevel = e.ProficiencyLevel?.ToString(),
-            YearsOfExperience = e.YearsOfExperience
-        }).ToList();
 
         await _audit.LogAsync("UPDATE_ADVISOR_PROFILE", "Advisor", advisor.AdvisorID, null);
         _logger.LogInformation("Advisor profile {AdvisorId} updated", advisor.AdvisorID);
@@ -277,7 +270,7 @@ public class AdvisorService : IAdvisorService
             {
                 Category = e.Category,
                 SubTopic = e.SubTopic,
-                ProficiencyLevel = e.ProficiencyLevel?.ToString(),
+                ProficiencyLevel = e.ProficiencyLevel,
                 YearsOfExperience = e.YearsOfExperience
             }).ToList()
         }).ToList();
@@ -326,7 +319,7 @@ public class AdvisorService : IAdvisorService
         {
             Category = e.Category,
             SubTopic = e.SubTopic,
-            ProficiencyLevel = e.ProficiencyLevel?.ToString(),
+            ProficiencyLevel = e.ProficiencyLevel,
             YearsOfExperience = e.YearsOfExperience
         }).ToList(),
         Availability = availability != null ? MapAvailabilityDto(availability) : null,

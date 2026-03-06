@@ -17,11 +17,6 @@ public class CreateStartupRequestValidator : AbstractValidator<CreateStartupRequ
             .NotEmpty().WithMessage("Company name is required")
             .MaximumLength(200).WithMessage("Company name must not exceed 200 characters");
 
-        RuleFor(x => x.Stage)
-            .NotEmpty().WithMessage("Stage is required")
-            .Must(s => AllowedStages.Contains(s!))
-            .WithMessage($"Stage must be one of: {string.Join(", ", AllowedStages)}");
-
         RuleFor(x => x.IndustryID)
             .GreaterThan(0).When(x => x.IndustryID.HasValue)
             .WithMessage("IndustryID must be a positive integer");
@@ -79,10 +74,6 @@ public class UpdateStartupRequestValidator : AbstractValidator<UpdateStartupRequ
         RuleFor(x => x.CompanyName)
             .MaximumLength(200).WithMessage("Company name must not exceed 200 characters")
             .NotEmpty().When(x => x.CompanyName != null).WithMessage("Company name cannot be empty");
-
-        RuleFor(x => x.Stage)
-            .Must(s => s == null || AllowedStages.Contains(s))
-            .WithMessage($"Stage must be one of: {string.Join(", ", AllowedStages)}");
 
         RuleFor(x => x.IndustryID)
             .GreaterThan(0).When(x => x.IndustryID.HasValue)
