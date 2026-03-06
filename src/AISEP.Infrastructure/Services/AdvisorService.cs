@@ -140,7 +140,13 @@ public class AdvisorService : IAdvisorService
 
         _db.Advisors.Update(advisor);
 
-        await _db.SaveChangesAsync();
+        var result = newItems.Select(e => new ExpertiseItemDto
+        {
+            Category = e.Category,
+            SubTopic = e.SubTopic,
+            ProficiencyLevel = e.ProficiencyLevel?.ToString(),
+            YearsOfExperience = e.YearsOfExperience
+        }).ToList();
 
         await _audit.LogAsync("UPDATE_ADVISOR_PROFILE", "Advisor", advisor.AdvisorID, null);
         _logger.LogInformation("Advisor profile {AdvisorId} updated", advisor.AdvisorID);
